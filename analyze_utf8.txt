@@ -1,0 +1,6 @@
+﻿Analyzing change_life...                                        
+
+  error - Undefined name 'habitProvider1' - lib\views\home_screen.dart:16:30 - undefined_identifier
+  error - Undefined name 'countComplete' - lib\views\home_screen.dart:17:33 - undefined_identifier
+  error - The method 'HabitTile' isn't defined for the type '_HomePageState' - lib\views\home_screen.dart:28:22 - undefined_method
+

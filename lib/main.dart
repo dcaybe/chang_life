@@ -1,4 +1,4 @@
-import 'package:change_life/home_screen.dart';
+import 'package:change_life/views/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
