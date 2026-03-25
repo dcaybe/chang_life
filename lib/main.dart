@@ -1,14 +1,11 @@
-import 'package:change_life/services/api_service.dart';
 import 'package:change_life/views/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
 
-// void main() {
-//   // Bao bọc toàn bộ ứng dụng bằng ProviderScope
-//   // runApp(const ProviderScope(child: MainApp()));
-
-// }
+void main() {
+  // Bao bọc toàn bộ ứng dụng bằng ProviderScope
+  runApp(const ProviderScope(child: MainApp()));
+}
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
@@ -17,10 +14,4 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(home: Scaffold(body: HomeScreen()));
   }
-}
-
-void main() async {
-  final api = ApiService();
-
-  await api.fetchTodos();
 }

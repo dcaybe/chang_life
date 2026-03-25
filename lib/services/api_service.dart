@@ -3,18 +3,16 @@ import 'package:change_life/models/todo.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-
+  String url = "https://jsonplaceholder.typicode.com/todos";
   Future<List<Todo>> fetchTodos() async {
+    final res = await http.get(Uri.parse(url));
 
-  final res = await http.get(Uri.parse("https://jsonplaceholder.typicode.com/todos"))
+    if (res.statusCode != 200) {
+      throw Exception("API error: ${res.statusCode}");
+    }
 
-    final data = jsonDecode(res.body);
+    final List data = jsonDecode(res.body);
 
-    final list = data.map<Todo>((e) {
-      return Todo.fromJson(e);
-    }).toList();
-
-    return list;
+    return data.map((e) => Todo.fromJson(e)).toList();
   }
-
 }
