@@ -9,11 +9,11 @@ class HabitTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final habit = ref.watch(habitProvider(id));
+    final isDone = ref.watch(habitProvider(id).select((h) => h.isDone));
     return ListTile(
-      title: Text(habit.name),
+      title: Text(ref.watch(habitProvider(id)).name),
       leading: Checkbox(
-        value: habit.isDone,
+        value: isDone,
         onChanged: (_) {
           ref.read(toggleHabitProvider)(id);
         },

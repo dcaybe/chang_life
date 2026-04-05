@@ -10,13 +10,14 @@ final habitVMProvider = NotifierProvider<HabitViewModel, List<Habit>>(
   HabitViewModel.new,
 );
 final countComplete = Provider<int>((ref) {
-  final habits = ref.watch(habitVMProvider);
-  return habits.where((h) => h.isDone).length;
+  return ref.watch(
+    habitVMProvider.select((h) => h.where((h) => h.isDone).length),
+  );
 });
 final habitProvider = Provider.family<Habit, String>((ref, id) {
-  final list = ref.watch(habitVMProvider);
-
-  return list.firstWhere((h) => h.id == id);
+  return ref.watch(
+    habitVMProvider.select((list) => list.firstWhere((h) => h.id == id)),
+  );
 });
 
 // toggle
