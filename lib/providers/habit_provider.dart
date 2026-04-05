@@ -1,3 +1,4 @@
+import 'package:change_life/models/food.dart';
 import 'package:change_life/models/habit.dart';
 import 'package:change_life/models/todo.dart';
 import 'package:change_life/services/api_service.dart';
@@ -33,5 +34,13 @@ final habitServiceProvider = Provider<HabitService>((ref) {
 final todoApiProvider = Provider<ApiService>((ref) {
   return ApiService();
 });
+final foodApiProvider = Provider<FoodApi>((ref) {
+  return FoodApi();
+});
 
-final testProvider = AsyncNotifierProvider<TestVM, List<Todo>>(TestVM.new);
+final testProvider = AsyncNotifierProvider.autoDispose<TestVM, List<Todo>>(
+  TestVM.new,
+);
+final foodVMProvider = AsyncNotifierProvider.autoDispose<FoodVM, List<Food>>(
+  FoodVM.new,
+);

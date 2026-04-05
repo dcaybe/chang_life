@@ -1,0 +1,1088 @@
+✅ Khung cố định mỗi ngày (T2–T6)
+Giữ nguyên khung này, chỉ đổi nội dung.
+7h – 9h30   Flutter deep 1
+9h30 – 10h  code nhẹ
+
+11h15 – 11h35 English
+11h35 – 12h nhẹ
+
+12h30 – 14h30 Flutter deep 2
+
+18h30 – 18h50 English
+
+19h – 21h30 Flutter deep 3
+
+21h30 – 22h15 nhẹ
+✅ DAY 1 — Refactor + rebuild
+🎯 mục tiêu
+hiểu rebuild
+tách file
+không thêm logic
+7h – 9h30
+Ôn:
+rebuild là gì
+setState rebuild gì
+ref.watch rebuild gì
+ref.read
+ConsumerWidget vs ConsumerStatefulWidget
+Phải tự trả lời được.
+9h30 – 10h
+Đọc code hiện tại của bạn.
+Không sửa.
+Hiểu flow.
+11h15 English
+Tech English:
+state
+rebuild
+widget
+provider
+lifecycle
+12h30 – 14h30
+Tách project:
+models/habit.dart
+providers/habit_provider.dart
+screens/home_screen.dart
+widgets/habit_tile.dart
+Không đổi logic.
+19h – 21h30
+Debug rebuild
+print trong:
+build
+provider
+toggle
+Xem:
+tile rebuild?
+list rebuild?
+count rebuild?
+21h30
+Đọc lại.
+✅ DAY 2 — Riverpod lifecycle
+🎯 mục tiêu
+Hiểu:
+Notifier lifecycle
+Provider lifecycle
+autoDispose
+invalidate
+Sáng
+Học:
+Notifier build()
+khi nào chạy lại
+dispose
+Trưa code
+Tạo provider test:
+counterProvider
+randomProvider
+Test:
+watch
+read
+listen
+Tối
+Test:
+autoDispose
+keepAlive
+ref.invalidate
+Phải hiểu.
+✅ DAY 3 — provider.family sâu
+Bạn đang dùng → phải master.
+Sáng
+Học:
+family là gì
+tại sao cần
+lifecycle
+Trưa
+Test HabitTile rebuild.
+Print build.
+Toggle từng item.
+Tối
+Test sai cách:
+watch list
+So sánh rebuild.
+Hiểu vì sao family tốt.
+✅ DAY 4 — TextField + add habit
+Sáng
+Học:
+TextEditingController
+dispose
+Stateful lifecycle
+Trưa
+Thêm:
+TextField
+add button
+addHabit
+Tối
+Debug:
+add rebuild gì
+tile rebuild không
+count rebuild không
+✅ DAY 5 — delete + filter
+Sáng
+Học:
+Dismissible
+derived provider
+combine provider
+Trưa
+Thêm:
+swipe delete
+Tối
+Thêm filter:
+filterProvider
+filteredListProvider
+✅ DAY 6 — lifecycle nâng cao
+Sáng
+Học:
+initState + ref
+ref.listen
+dispose
+ConsumerState lifecycle
+Trưa
+Test:
+ref.listen
+show snackbar
+Tối
+Test:
+provider change → listen chạy
+✅ DAY 7 — nghỉ (đi làm)
+Không học nặng.
+Chỉ:
+English 20p
+đọc code 10p
+✅ Sau tuần 1 bạn sẽ lên level
+✔ intern thật
+✔ hiểu riverpod
+✔ hiểu lifecycle
+✔ code không mù
+Tuần 2 sẽ vào:
+MVVM + clean architecture + refactor project
+📅 TUẦN 2 — LỊCH TỪNG NGÀY
+✅ DAY 1 — MVVM là gì
+Sáng
+Học:
+MVC vs MVVM
+Model là gì
+View là gì
+ViewModel là gì
+Flutter nên dùng MVVM
+Phải hiểu:
+UI không chứa logic
+logic nằm trong viewmodel
+Trưa
+Vẽ sơ đồ Habit app:
+UI
+↓
+ViewModel
+↓
+Model
+Không code.
+Tối
+Đọc code hiện tại
+Chỉ ra:
+logic nằm ở đâu
+UI đang làm gì sai
+✅ DAY 2 — Tạo structure MVVM
+Sáng
+Học structure:
+models/
+viewmodels/
+views/
+Trưa
+Tạo folder:
+models/habit.dart
+viewmodels/habit_vm.dart
+views/home_screen.dart
+widgets/habit_tile.dart
+Chưa refactor.
+Tối
+Di chuyển code sang file mới.
+Không đổi logic.
+✅ DAY 3 — ViewModel thật
+Sáng
+Học:
+ViewModel giữ state
+View chỉ watch
+Trưa
+Đổi:
+HabitNotifier → HabitViewModel
+class HabitViewModel extends Notifier<List<Habit>>
+Tối
+UI chỉ:
+ref.watch(habitVMProvider)
+Không logic trong UI.
+✅ DAY 4 — UI sạch
+Sáng
+Học:
+UI không gọi logic trực tiếp
+UI gọi ViewModel
+Trưa
+Sửa:
+ref.read(habitVMProvider.notifier).toggle()
+Tối
+Xóa logic khỏi widget.
+✅ DAY 5 — Derived state trong MVVM
+Sáng
+Học:
+computed state
+derived provider
+Trưa
+countComplete → ViewModel
+Tối
+filter → ViewModel
+✅ DAY 6 — Service layer (quan trọng)
+Chuẩn tuyển dụng.
+Sáng
+Học:
+service là gì
+repository là gì
+Trưa
+Tạo:
+services/habit_service.dart
+Tối
+ViewModel gọi service.
+✅ DAY 7 — nghỉ
+Chỉ đọc.
+🎯 Sau tuần 2 bạn sẽ
+✔ code như dev
+✔ hiểu MVVM
+✔ hiểu structure
+✔ pass intern test dễ hơn
+🎯 MỤC TIÊU TUẦN 3
+Sau tuần 3 bạn phải làm được:
+gọi API bằng http/dio
+parse json
+dùng FutureProvider / AsyncNotifier
+xử lý loading / error / data
+tách service
+gọi API trong ViewModel
+Nếu làm được → đủ đi phỏng vấn intern.
+📦 Structure cuối tuần 3
+lib/
+  models/
+  viewmodels/
+  views/
+  widgets/
+  services/
+  providers/
+Thêm:
+services/api_service.dart
+models/food.dart
+viewmodels/food_vm.dart
+views/nutrition_screen.dart
+⏱ Khung giờ vẫn giữ
+7h – 9h30
+12h30 – 14h30
+19h – 21h30
+Không đổi.
+📅 TUẦN 3 — LỊCH TỪNG NGÀY
+✅ DAY 1 — HTTP + JSON cơ bản
+🎯 mục tiêu
+Hiểu cách gọi API trong Dart.
+Sáng
+Học:
+http package
+Future
+async await
+jsonDecode
+Phải hiểu:
+Future là gì
+await làm gì
+async là gì
+Trưa
+Test API đơn giản:
+https://jsonplaceholder.typicode.com/todos
+Gọi API trong Dart.
+In ra console.
+Tối
+Parse JSON → model
+Tạo:
+todo.dart
+✅ DAY 2 — Service layer
+🎯 mục tiêu
+Không gọi API trong UI.
+Sáng
+Học:
+service là gì
+repository là gì
+vì sao cần
+Trưa
+Tạo:
+services/api_service.dart
+Viết:
+fetchTodos()
+Tối
+Test service.
+Không UI.
+✅ DAY 3 — FutureProvider
+🎯 mục tiêu
+Biết async trong Riverpod.
+Sáng
+Học:
+FutureProvider
+AsyncValue
+when()
+Trưa
+Tạo:
+todoProvider
+Tối
+UI:
+loading
+error
+data
+Phải làm đủ 3.
+✅ DAY 4 — AsyncNotifier (quan trọng)
+Tin tuyển dụng hỏi nhiều.
+Sáng
+Học:
+AsyncNotifier
+build async
+ref.watch async
+Trưa
+Tạo:
+FoodViewModel extends AsyncNotifier
+Tối
+Call API trong ViewModel.
+Không trong UI.
+✅ DAY 5 — Nutrition screen thật
+🎯 thêm màn mới
+App bạn sẽ có:
+Habit
+Nutrition
+Sáng
+Tạo model food.
+Trưa
+Tạo screen.
+Tối
+Hiển thị list từ API.
+✅ DAY 6 — loading / error / retry / refresh
+Sáng
+Học:
+ref.invalidate
+refresh
+retry
+Trưa
+Thêm refresh button.
+Tối
+Thêm error UI.
+✅ DAY 7 — nghỉ
+Chỉ đọc code.
+🎯 Sau tuần 3 bạn đạt level
+✔ biết MVVM
+✔ biết REST
+✔ biết async
+✔ biết Riverpod async
+✔ có 2 màn hình
+✔ có service
+→ level intern thật.
+🎯 MỤC TIÊU TUẦN 4
+Sau tuần 4 bạn phải hiểu:
+provider lifecycle
+widget lifecycle + provider lifecycle
+autoDispose
+keepAlive
+ref.invalidate
+cache data
+tránh rebuild thừa
+tối ưu UI
+App tuần 4 sẽ nâng cấp:
+Habit + Nutrition + cache + refresh + filter + tối ưu rebuild
+📦 Structure vẫn giữ
+lib/
+  models/
+  viewmodels/
+  views/
+  widgets/
+  services/
+  providers/
+Không thêm layer mới, chỉ nâng cấp.
+⏱ Khung giờ giữ nguyên
+7h – 9h30
+12h30 – 14h30
+19h – 21h30
+📅 TUẦN 4 — LỊCH TỪNG NGÀY
+✅ DAY 1 — Provider lifecycle
+🎯 mục tiêu
+Hiểu:
+provider tạo khi nào
+dispose khi nào
+build chạy khi nào
+Sáng
+Học:
+Provider lifecycle
+Notifier lifecycle
+AsyncNotifier lifecycle
+Phải hiểu:
+build()
+dispose()
+invalidate()
+Trưa
+Test:
+print trong build
+Test:
+vào màn hình
+ra màn hình
+quay lại
+Tối
+Test nhiều provider.
+Hiểu cái nào bị dispose.
+✅ DAY 2 — autoDispose + keepAlive
+Tin tuyển dụng hỏi nhiều.
+Sáng
+Học:
+autoDispose
+keepAlive
+khi nào nên dùng
+Trưa
+Test:
+FutureProvider.autoDispose
+Tối
+Test:
+ref.keepAlive()
+So sánh.
+✅ DAY 3 — Cache data
+App thật phải cache.
+Sáng
+Học:
+cache là gì
+giữ state khi đổi màn hình
+Trưa
+Nutrition screen → không gọi API lại.
+Tối
+Dùng:
+keepAlive
+hoặc
+StateProvider cache
+✅ DAY 4 — ref.invalidate / refresh
+Quan trọng.
+Sáng
+Học:
+ref.invalidate
+refresh
+reload
+Trưa
+Thêm button:
+Refresh
+Tối
+Retry khi error.
+✅ DAY 5 — Tối ưu rebuild
+Tuần 1 đã học, giờ dùng thật.
+Sáng
+Học:
+rebuild scope
+watch vs read
+select
+Trưa
+Optimize HabitTile.
+Tối
+Optimize list.
+Chỉ rebuild item.
+✅ DAY 6 — listen / side effect
+Rất hay hỏi.
+Sáng
+Học:
+ref.listen
+side effect
+snackbar
+dialog
+Trưa
+Test:
+done → snackbar.
+Tối
+Test:
+API error → dialog.
+✅ DAY 7 — nghỉ
+Chỉ đọc code.
+🎯 Sau tuần 4 bạn đạt
+✔ Riverpod nâng cao
+✔ lifecycle
+✔ cache
+✔ refresh
+✔ async chuẩn
+✔ MVVM chuẩn
+→ đủ intern mạnh.
+Tuần 5 sẽ học
+Navigation + multi screen + go_router + app thật nhiều tab
+Tuần 5 rất quan trọng vì app sẽ thành app thật.
+Nếu muốn → mình chia luôn tuần 5.
+tiếp tục vơi tuần 5
+Tuần 5 là tuần chuyển từ app demo → app thật nhiều màn hình, và cũng là phần mà tin tuyển dụng yêu cầu rất nhiều:
+Navigation
+go_router / Navigator
+nhiều screen
+truyền dữ liệu giữa màn hình
+bottom navigation / tab
+structure app lớn
+Sau tuần 5, app của bạn phải giống:
+App thật có nhiều chức năng (Habit / Nutrition / Goal / Workout / Setting)
+Tuần này rất quan trọng vì khi đi phỏng vấn, người ta nhìn vào:
+project có nhiều screen không
+navigation có sạch không
+structure có rõ không
+🎯 MỤC TIÊU TUẦN 5
+Sau tuần 5 bạn phải làm được:
+Navigator
+go_router (ưu tiên)
+truyền data giữa screen
+nested navigation
+bottom navigation
+multi feature app
+App của bạn sẽ có:
+Home
+Habit
+Nutrition
+Goal
+Workout
+Setting
+Không cần quá đẹp, cần đúng kiến trúc.
+📦 Structure sau tuần 5
+lib/
+  models/
+  viewmodels/
+  views/
+    home/
+    habit/
+    nutrition/
+    goal/
+    workout/
+    setting/
+  widgets/
+  services/
+  providers/
+  router/
+Tuần 5 sẽ thêm:
+router/app_router.dart
+⏱ Khung giờ giữ nguyên
+7h – 9h30
+12h30 – 14h30
+19h – 21h30
+Không đổi.
+📅 TUẦN 5 — LỊCH TỪNG NGÀY
+✅ DAY 1 — Navigator cơ bản
+🎯 mục tiêu
+Hiểu navigation hoạt động thế nào
+Sáng
+Học:
+Navigator.push
+pop
+route
+MaterialPageRoute
+Phải hiểu:
+stack navigation
+Trưa
+Test:
+Home → Habit
+Habit → back
+Tối
+Truyền data khi push.
+✅ DAY 2 — go_router (quan trọng)
+Tin tuyển dụng hỏi rất nhiều.
+Sáng
+Học:
+go_router là gì
+vì sao dùng
+khác Navigator
+Trưa
+Cài:
+go_router
+Tạo:
+router/app_router.dart
+Tối
+Tạo route:
+/
+habit
+nutrition
+✅ DAY 3 — Nested navigation
+App thật cần.
+Sáng
+Học:
+shell route
+nested route
+Trưa
+Tạo:
+BottomNavigationBar
+Tab:
+Habit
+Nutrition
+Goal
+Tối
+Switch tab.
+Không mất state.
+✅ DAY 4 — Feature structure
+Quan trọng cho tuyển dụng.
+Sáng
+Học cách chia folder theo feature.
+Trưa
+Chia:
+views/habit/
+views/nutrition/
+views/goal/
+Tối
+Move code.
+Không đổi logic.
+✅ DAY 5 — truyền data giữa màn
+Quan trọng.
+Sáng
+Học:
+params
+query
+extra
+Trưa
+Test:
+open habit detail
+Tối
+Test:
+open food detail
+✅ DAY 6 — Screen mới (Goal / Workout)
+App phải có nhiều feature.
+Sáng
+Tạo model Goal.
+Trưa
+Tạo screen Goal.
+Tối
+Tạo screen Workout.
+Không cần logic phức tạp.
+✅ DAY 7 — nghỉ
+Chỉ đọc code.
+🎯 Sau tuần 5 bạn đạt
+✔ navigation chuẩn
+✔ go_router
+✔ multi screen
+✔ app lớn
+✔ structure giống công ty
+→ level intern rất ổn.
+Tuần 6 sẽ học
+Local storage + persistence + save data + hive / shared_preferences
+Tuần 6 rất quan trọng vì app phải lưu data.
+Nếu muốn mình chia luôn tuần 6.
+tiếp tục với tuần 6
+Tuần 6 là tuần làm cho app của bạn giống app thật dùng hằng ngày, vì từ tuần 1 → 5 app của bạn vẫn chỉ chạy trong RAM, tắt app là mất dữ liệu.
+Tin tuyển dụng Flutter rất hay hỏi:
+lưu dữ liệu local thế nào
+shared_preferences / hive / isar
+cache data
+persistence
+offline data
+login token lưu ở đâu
+→ tất cả nằm ở tuần 6.
+Tuần này không khó về UI, nhưng rất quan trọng về thực tế + phỏng vấn.
+🎯 MỤC TIÊU TUẦN 6
+Sau tuần 6 bạn phải biết:
+lưu dữ liệu local
+đọc dữ liệu khi mở app
+cache API
+lưu setting
+lưu list object
+lưu token (giả lập)
+tách storage service
+App tuần 6 sẽ thêm:
+lưu habit
+lưu goal
+lưu setting
+cache nutrition API
+📦 Structure sau tuần 6
+lib/
+  models/
+  viewmodels/
+  views/
+  widgets/
+  services/
+    api_service.dart
+    storage_service.dart
+  providers/
+  router/
+Thêm:
+services/storage_service.dart
+❗ Chọn công nghệ
+Tuần 6 nên học:
+Với 7 tuần:
+shared_preferences + hive là đủ.
+⏱ Khung giờ giữ nguyên
+7h – 9h30
+12h30 – 14h30
+19h – 21h30
+📅 TUẦN 6 — LỊCH TỪNG NGÀY
+✅ DAY 1 — shared_preferences cơ bản
+🎯 mục tiêu
+Lưu dữ liệu đơn giản.
+Sáng
+Học:
+shared_preferences là gì
+lưu string
+lưu int
+lưu bool
+Trưa
+Test:
+save username
+Tối
+Load khi mở app.
+✅ DAY 2 — storage service
+Không lưu trực tiếp trong UI.
+Sáng
+Học:
+service layer cho storage
+Trưa
+Tạo:
+storage_service.dart
+Tối
+ViewModel gọi service.
+✅ DAY 3 — lưu Habit list
+Quan trọng.
+Sáng
+Học:
+convert object → json
+json → object
+Trưa
+Habit → toJson
+Tối
+Lưu list habit.
+✅ DAY 4 — Hive (quan trọng hơn)
+Tin tuyển dụng thích.
+Sáng
+Học:
+hive là gì
+box
+adapter
+Trưa
+Cài hive.
+Tối
+Lưu habit bằng hive.
+✅ DAY 5 — Cache API
+App thật phải cache.
+Sáng
+Học:
+cache API
+load local trước
+gọi API sau
+Trưa
+Nutrition cache.
+Tối
+Không gọi API lại khi mở màn.
+✅ DAY 6 — Setting + token giả
+Rất giống app thật.
+Sáng
+Lưu:
+dark mode
+username
+Trưa
+Lưu token giả.
+Tối
+Load khi start app.
+✅ DAY 7 — nghỉ
+Chỉ đọc code.
+🎯 Sau tuần 6 bạn đạt
+✔ local storage
+✔ hive
+✔ shared_preferences
+✔ cache
+✔ persistence
+✔ app giống thật
+→ level intern mạnh.
+Tuần 7 là tuần cuối
+Tuần quan trọng nhất:
+polish project + tối ưu + chuẩn bị phỏng vấn + câu hỏi + GitHub + CV
+Tuần 7 quyết định có pass interview không.
+Nếu muốn mình chia luôn tuần 7 (tuần phỏng vấn).
+cuối cùng là tuần 7
+Tuần 7 là tuần quyết định.
+6 tuần trước là để học, tuần 7 là để biến tất cả thành thứ có thể mang đi phỏng vấn.
+Nhiều người học rất nhiều nhưng fail vì:
+project chưa sạch
+code rối
+không biết giải thích code
+không có GitHub đẹp
+không trả lời được câu hỏi cơ bản
+Tuần 7 mục tiêu:
+🔥 polish project
+🔥 clean code
+🔥 chuẩn bị GitHub
+🔥 chuẩn bị CV
+🔥 luyện câu hỏi phỏng vấn
+🔥 fix lỗ hổng kiến thức
+Tuần này không học cái mới nhiều, mà củng cố + hoàn thiện.
+🎯 MỤC TIÊU TUẦN 7
+Sau tuần 7 bạn phải có:
+1 app Flutter hoàn chỉnh
+MVVM
+Riverpod
+REST API
+Navigation
+Storage
+Cache
+nhiều screen
+GitHub đẹp
+biết giải thích code
+trả lời được câu hỏi cơ bản
+→ đủ đi phỏng vấn intern / fresher.
+📦 Project cuối cùng nên có
+App thay đổi cuộc sống:
+Habit
+Nutrition (API)
+Goal
+Workout
+Setting
+Local storage
+Cache API
+MVVM
+Riverpod
+go_router
+Nếu có đủ → rất tốt.
+⏱ Khung giờ giữ nguyên
+7h – 9h30
+12h30 – 14h30
+19h – 21h30
+📅 TUẦN 7 — LỊCH TỪNG NGÀY
+✅ DAY 1 — Clean code toàn project
+🎯 mục tiêu
+Code phải nhìn giống project công ty.
+Sáng
+Sửa:
+tên file
+tên class
+tên provider
+tên viewmodel
+Quy tắc:
+habit_viewmodel.dart
+habit_model.dart
+habit_screen.dart
+Trưa
+Xóa code thừa.
+Tối
+Format project.
+✅ DAY 2 — Kiểm tra architecture
+🎯 mục tiêu
+Không để logic trong UI.
+Sáng
+Check:
+UI có logic không
+ViewModel có gọi service không
+service có gọi API không
+Trưa
+Fix sai.
+Tối
+Test lại.
+✅ DAY 3 — GitHub
+Rất quan trọng.
+Sáng
+Tạo repo.
+Trưa
+Push project.
+Tối
+Viết README:
+App name
+Feature
+Architecture
+Tech used
+✅ DAY 4 — CV + mô tả project
+Sáng
+Viết CV:
+Flutter
+Riverpod
+MVVM
+REST API
+Hive
+go_router
+Trưa
+Viết mô tả project.
+Tối
+Tập nói:
+Tôi đã làm app này bằng MVVM + Riverpod…
+✅ DAY 5 — Luyện câu hỏi phỏng vấn
+Phải làm.
+Sáng
+Ôn:
+rebuild
+watch vs read
+notifier
+async
+future
+Trưa
+Ôn:
+MVVM
+service
+repository
+Tối
+Ôn:
+API
+cache
+storage
+✅ DAY 6 — Mock interview
+Tự hỏi tự trả lời.
+Ví dụ:
+Riverpod là gì
+MVVM là gì
+FutureProvider là gì
+autoDispose là gì
+cache là gì
+✅ DAY 7 — nghỉ nhẹ
+Chỉ đọc.
+Không học nặng.
+🎯 Sau 7 tuần bạn đạt level
+✔ intern Flutter
+✔ fresher yếu
+✔ có thể pass test
+✔ có project thật
+Không phải senior, nhưng đủ xin việc.
+Nếu muốn
+Mình có thể làm tiếp:
+danh sách câu hỏi phỏng vấn Flutter hay gặp nhất
+Cái này rất nên làm.
+tổng quát lại lịch 7 tuần
+Dưới đây là tổng quát toàn bộ lộ trình 7 tuần, gộp lại thành 1 bản dễ nhìn để bạn dùng trong suốt 7 tuần.
+Mục tiêu cuối:
+✅ Đủ kiến thức Flutter intern
+✅ Có 1 project hoàn chỉnh
+✅ Biết MVVM + Riverpod + REST + Storage + Navigation
+✅ Sẵn sàng phỏng vấn
+Mình sẽ tổng kết theo:
+Mục tiêu từng tuần
+Kiến thức học
+Làm gì trong app
+Level đạt được
+🧭 Tổng lộ trình 7 tuần
+✅ TUẦN 1 — Riverpod + lifecycle
+Học
+rebuild
+watch vs read
+notifier
+provider lifecycle
+family
+derived provider
+listen
+App
+Habit screen
+add / delete / toggle
+filter
+count
+family provider
+Kết quả
+✔ hiểu Riverpod
+✔ hiểu rebuild
+✔ code không mù
+✅ TUẦN 2 — MVVM + clean architecture
+Học
+MVVM
+View / ViewModel / Model
+service layer
+structure project
+App
+Refactor:
+models/
+viewmodels/
+views/
+services/
+widgets/
+Kết quả
+✔ code giống dev
+✔ biết architecture
+✔ pass intern test dễ hơn
+✅ TUẦN 3 — REST API + async
+Học
+http / dio
+Future
+async await
+FutureProvider
+AsyncNotifier
+loading / error / data
+App
+Thêm:
+Nutrition screen
+API call
+model parse
+service call
+Kết quả
+✔ biết gọi API
+✔ biết async
+✔ biết MVVM + API
+✅ TUẦN 4 — lifecycle nâng cao + cache
+Học
+provider lifecycle
+autoDispose
+keepAlive
+invalidate
+cache
+optimize rebuild
+listen
+App
+cache API
+refresh
+retry
+tối ưu list
+snackbar / dialog
+Kết quả
+✔ Riverpod nâng cao
+✔ hiểu lifecycle
+✔ app chạy mượt
+✅ TUẦN 5 — Navigation + multi screen
+Học
+Navigator
+go_router
+nested route
+bottom nav
+params
+App
+Thêm:
+Habit
+Nutrition
+Goal
+Workout
+Setting
+Structure:
+views/habit/
+views/nutrition/
+views/goal/
+Kết quả
+✔ app giống thật
+✔ biết navigation
+✔ project lớn
+✅ TUẦN 6 — Local storage + persistence
+Học
+shared_preferences
+hive
+json
+cache local
+save state
+App
+save habit
+save goal
+save setting
+cache API
+Kết quả
+✔ app không mất data
+✔ biết storage
+✔ giống app thật
+✅ TUẦN 7 — Hoàn thiện + phỏng vấn
+Học
+clean code
+GitHub
+CV
+interview question
+giải thích code
+App
+format code
+README
+push repo
+test full app
+Kết quả
+✔ có project show
+✔ trả lời được phỏng vấn
+✔ đủ xin intern
+🎯 Sau 7 tuần bạn đạt level
+→ đủ xin intern / fresher.
+Tool | Mức độ | Khuyên dùng
+shared_preferences | dễ | ✅ bắt buộc
+hive | trung bình | ✅ nên học
+isar | khó | optional
+Tuần | Trọng tâm | Làm trong app | Level
+1 | Riverpod + lifecycle | Habit chuẩn | Cơ bản chắc
+2 | MVVM + structure | Refactor project | Intern level
+3 | REST API + async | Nutrition API | Intern thật
+4 | lifecycle nâng cao + cache | optimize + refresh | Intern mạnh
+5 | Navigation + multi screen | nhiều màn | App thật
+6 | Local storage | save data | App thật hoàn chỉnh
+7 | Polish + interview | GitHub + CV | Sẵn sàng xin việc
+Skill | Level
+Flutter UI | khá
+Riverpod | khá
+MVVM | đủ dùng
+REST API | đủ
+Navigation | đủ
+Storage | đủ
+Architecture | đủ
+Interview | có thể pass

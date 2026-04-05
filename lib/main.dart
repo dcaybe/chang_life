@@ -1,4 +1,5 @@
 import 'package:change_life/views/home_screen.dart';
+import 'package:change_life/views/nutrition_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,6 +13,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: Scaffold(body: HomeScreen()));
+    return const MaterialApp(home: Scaffold(body: NutritionScreen()));
   }
 }
