@@ -14,6 +14,20 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
+    ref.listen<int>(countComplete, (previous, next) {
+      if (next > (previous ?? 0)) {
+        // Chỉ hiện Snackbar nếu số task hoàn thành TĂNG lên
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Done task'),
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    });
+    
+
     final habits = ref.watch(habitVMProvider);
     final completed = ref.watch(countComplete);
     final total = habits.length;

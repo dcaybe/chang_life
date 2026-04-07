@@ -7,6 +7,26 @@ class NutritionScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<AsyncValue>(foodVMProvider, (previous, next) {
+      // Nếu có lỗi, VÀ không ở trạng thái Loading
+      if (next.hasError && !next.isLoading) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Có lỗi xảy ra'),
+              content: Text(next.error.toString()),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Đóng'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    });
     final foods = ref.watch(foodVMProvider);
     return Scaffold(
       appBar: AppBar(

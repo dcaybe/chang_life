@@ -10,9 +10,7 @@ class TestAsync extends ConsumerWidget {
     final testAsync = ref.watch(testProvider);
 
     return testAsync.when(
-      data: (v) => Column(
-        children: v.map((todo) => Text(todo.title)).toList(),
-      ),
+      data: (v) => Text(v.length.toString()),
       loading: () => const CircularProgressIndicator(),
       error: (e, _) => Text("Lỗi: $e"),
     );
