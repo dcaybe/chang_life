@@ -28,12 +28,14 @@ class _HomePageState extends ConsumerState<HomeScreen> {
         );
       }
     });
+    final storageService = ref.watch(storageServiceProvider);
+    final name = storageService.getUsername();
     final habits = ref.watch(habitVMProvider);
     final completed = ref.watch(countComplete);
     final total = habits.length;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Habit'),
+        title: Text('Habit, Xin chào $name'),
         actions: [
           IconButton(
             onPressed: () => ref.invalidate(habitVMProvider),
@@ -59,6 +61,15 @@ class _HomePageState extends ConsumerState<HomeScreen> {
           TestAsync(),
           const SizedBox(height: 20),
           Text(widget.userName),
+          // ElevatedButton(
+          //   onPressed: () async {
+          //     // Lưu tên mới
+          //     await storageService.saveUsername('Hung Flutter');
+          //     // Ép màn hình vẽ lại để hiển thị tên mới
+          //     setState(() {});
+          //   },
+          //   child: const Text('Đổi tên thành Hung Flutter'),
+          // ),
         ],
       ),
     );

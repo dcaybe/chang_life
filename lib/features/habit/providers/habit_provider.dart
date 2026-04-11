@@ -5,6 +5,7 @@ import 'package:change_life/features/habit/models/todo.dart';
 import 'package:change_life/services/api_service.dart';
 import 'package:change_life/services/habit_service.dart';
 import 'package:change_life/features/habit/viewmodels/habit_vm.dart';
+import 'package:change_life/services/storage_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final habitVMProvider = NotifierProvider<HabitViewModel, List<Habit>>(
@@ -46,3 +47,8 @@ final testProvider = AsyncNotifierProvider.autoDispose<TestVM, List<Todo>>(
 final foodVMProvider = AsyncNotifierProvider.autoDispose<FoodVM, List<Food>>(
   FoodVM.new,
 );
+
+final storageServiceProvider = Provider<StorageService>((ref) {
+  // Chúng ta sẽ "ném" ra một lỗi nếu chưa được khởi tạo ở main
+  throw UnimplementedError(); 
+});

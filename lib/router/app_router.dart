@@ -71,12 +71,14 @@ class AppRouter {
               ),
             ],
           ),
-          StatefulShellBranch(routes: [
-            GoRoute(
-              path: '/workout',
-              builder: (context, state) => const WorkoutScreen(),
-            ),
-          ])
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/workout',
+                builder: (context, state) => const WorkoutScreen(),
+              ),
+            ],
+          ),
         ],
       ),
     ],
