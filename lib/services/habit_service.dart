@@ -1,4 +1,4 @@
-import 'package:change_life/models/habit.dart';
+import 'package:change_life/features/habit/models/habit.dart';
 
 class HabitService {
   final List<Habit> _habits = [
@@ -22,5 +22,5 @@ class HabitService {
 
   void removeHabit(int index) {
     _habits.removeAt(index);
-  }
+  }                  
 }

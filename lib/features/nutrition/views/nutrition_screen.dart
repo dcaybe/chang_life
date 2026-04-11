@@ -1,6 +1,7 @@
-import 'package:change_life/providers/habit_provider.dart';
+import 'package:change_life/features/habit/providers/habit_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class NutritionScreen extends ConsumerWidget {
   const NutritionScreen({super.key});
@@ -48,6 +49,9 @@ class NutritionScreen extends ConsumerWidget {
                 return ListTile(
                   title: Text(food.name),
                   subtitle: Text('${food.calories} calories'),
+                  onTap: () {
+                    context.push('/nutrition/detail', extra: food);
+                  },
                 );
               },
             );

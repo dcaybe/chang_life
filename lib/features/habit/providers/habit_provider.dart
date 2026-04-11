@@ -1,9 +1,10 @@
-import 'package:change_life/models/food.dart';
-import 'package:change_life/models/habit.dart';
-import 'package:change_life/models/todo.dart';
+import 'package:change_life/features/nutrition/models/food.dart';
+import 'package:change_life/features/habit/models/habit.dart';
+import 'package:change_life/features/nutrition/viewmodels/food_vm.dart';
+import 'package:change_life/features/habit/models/todo.dart';
 import 'package:change_life/services/api_service.dart';
 import 'package:change_life/services/habit_service.dart';
-import 'package:change_life/viewmodels/habit_vm.dart';
+import 'package:change_life/features/habit/viewmodels/habit_vm.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final habitVMProvider = NotifierProvider<HabitViewModel, List<Habit>>(

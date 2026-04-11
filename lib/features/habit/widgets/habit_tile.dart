@@ -1,6 +1,7 @@
-import 'package:change_life/providers/habit_provider.dart';
+import 'package:change_life/features/habit/providers/habit_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class HabitTile extends ConsumerWidget {
   final String id;
@@ -18,6 +19,9 @@ class HabitTile extends ConsumerWidget {
           ref.read(toggleHabitProvider)(id);
         },
       ),
+      onTap: () {
+        context.push('/habit/detail', extra: ref.read(habitProvider(id)));
+      },
     );
   }
 }

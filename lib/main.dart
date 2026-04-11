@@ -1,10 +1,8 @@
-import 'package:change_life/views/home_screen.dart';
-import 'package:change_life/views/nutrition_screen.dart';
+import 'package:change_life/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  // Bao bọc toàn bộ ứng dụng bằng ProviderScope
   runApp(const ProviderScope(child: MainApp()));
 }
 
@@ -13,6 +11,9 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: Scaffold(body: NutritionScreen()));
+    return MaterialApp.router(
+      routerConfig: AppRouter.router,
+      debugShowCheckedModeBanner: false,
+    );
   }
 }
