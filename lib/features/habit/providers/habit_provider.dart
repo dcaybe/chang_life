@@ -2,6 +2,8 @@ import 'package:change_life/features/nutrition/models/food.dart';
 import 'package:change_life/features/habit/models/habit.dart';
 import 'package:change_life/features/nutrition/viewmodels/food_vm.dart';
 import 'package:change_life/features/habit/models/todo.dart';
+import 'package:change_life/features/settings/models/setting_model.dart';
+import 'package:change_life/features/settings/viewmodels/settings_vm.dart';
 import 'package:change_life/services/api_service.dart';
 import 'package:change_life/services/habit_service.dart';
 import 'package:change_life/features/habit/viewmodels/habit_vm.dart';
@@ -48,7 +50,3 @@ final foodVMProvider = AsyncNotifierProvider.autoDispose<FoodVM, List<Food>>(
   FoodVM.new,
 );
 
-final storageServiceProvider = Provider<StorageService>((ref) {
-  // Chúng ta sẽ "ném" ra một lỗi nếu chưa được khởi tạo ở main
-  throw UnimplementedError(); 
-});

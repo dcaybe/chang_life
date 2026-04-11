@@ -1,6 +1,7 @@
 import 'package:change_life/features/habit/providers/habit_provider.dart';
 import 'package:change_life/features/habit/widgets/habit_tile.dart';
 import 'package:change_life/features/habit/widgets/test_async.dart';
+import 'package:change_life/features/settings/providers/setting_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -37,9 +38,25 @@ class _HomePageState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         title: Text('Habit, Xin chào $name'),
         actions: [
-          IconButton(
-            onPressed: () => ref.invalidate(habitVMProvider),
-            icon: const Icon(Icons.refresh),
+          Row(
+            children: [
+              IconButton(
+                onPressed: () => ref.invalidate(habitVMProvider),
+                icon: const Icon(Icons.refresh),
+              ),
+              SizedBox(width: 10),
+              IconButton(
+                icon: Icon(
+                  ref.watch(settingsProvider).isDarkMode
+                      ? Icons.dark_mode
+                      : Icons.light_mode,
+                ),
+                onPressed: () {
+                  // Gọi hàm toggleDarkMode từ ViewModel
+                  ref.read(settingsProvider.notifier).toggleDarkMode();
+                },
+              ),
+            ],
           ),
         ],
       ),
