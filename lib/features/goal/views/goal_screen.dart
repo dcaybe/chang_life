@@ -1,17 +1,16 @@
 import 'package:change_life/features/goal/models/goal.dart';
+import 'package:change_life/features/goal/provider/goal_providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class GoalScreen extends StatelessWidget {
+class GoalScreen extends ConsumerWidget {
   const GoalScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final goals = [
-      Goal(id: '1', title: 'Học Flutter', description: 'Hoàn thành 8 tuần'),
-      Goal(id: '2', title: 'Tìm việc intern', description: 'Apply 10 công ty'),
-    ];
-
+  Widget build(BuildContext context, WidgetRef ref) {
+    final goalProviders = ref.watch(hiveServiceProvider);
+    final goals = goalProviders.getHabits();
     return Scaffold(
       appBar: AppBar(title: const Text('Goals')),
       body: ListView.builder(

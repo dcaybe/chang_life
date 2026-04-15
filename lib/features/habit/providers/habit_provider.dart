@@ -3,6 +3,7 @@ import 'package:change_life/features/habit/models/habit.dart';
 import 'package:change_life/features/nutrition/viewmodels/food_vm.dart';
 import 'package:change_life/features/habit/models/todo.dart';
 import 'package:change_life/features/settings/models/setting_model.dart';
+import 'package:change_life/features/settings/providers/setting_provider.dart';
 import 'package:change_life/features/settings/viewmodels/settings_vm.dart';
 import 'package:change_life/services/api_service.dart';
 import 'package:change_life/services/habit_service.dart';
@@ -32,7 +33,9 @@ final toggleHabitProvider = Provider((ref) {
 });
 // service
 final habitServiceProvider = Provider<HabitService>((ref) {
-  return HabitService();
+  final storage = ref.read(storageServiceProvider);
+
+  return HabitService(storage.prefs());
 });
 
 // api
@@ -49,4 +52,3 @@ final testProvider = AsyncNotifierProvider.autoDispose<TestVM, List<Todo>>(
 final foodVMProvider = AsyncNotifierProvider.autoDispose<FoodVM, List<Food>>(
   FoodVM.new,
 );
-

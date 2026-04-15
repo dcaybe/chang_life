@@ -34,4 +34,8 @@ class StorageService {
   int getClickCount() {
     return _prefs?.getInt('click_count') ?? 0;
   }
+
+  SharedPreferences prefs() {
+    return _prefs!;
+  }
 }

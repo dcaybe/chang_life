@@ -11,4 +11,12 @@ class Habit {
       isDone: isDone ?? this.isDone,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'name': name, 'isDone': isDone};
+  }
+
+  factory Habit.fromJson(Map<String, dynamic> json) {
+    return Habit(id: json['id'], name: json['name'], isDone: json['isDone']);
+  }
 }
