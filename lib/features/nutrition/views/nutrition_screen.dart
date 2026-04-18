@@ -1,4 +1,4 @@
-import 'package:change_life/features/habit/providers/habit_provider.dart';
+import 'package:change_life/features/nutrition/providers/nutrition_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -34,7 +34,7 @@ class NutritionScreen extends ConsumerWidget {
         title: const Text('Nutrition'),
         actions: [
           IconButton(
-            onPressed: () => ref.invalidate(foodVMProvider),
+            onPressed: () => ref.read(foodVMProvider.notifier).refresh(),
             icon: const Icon(Icons.refresh),
           ),
         ],
@@ -65,7 +65,7 @@ class NutritionScreen extends ConsumerWidget {
                 Text('Đã có lỗi xảy ra: $error', textAlign: TextAlign.center),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () => ref.invalidate(foodVMProvider),
+                  onPressed: () => ref.read(foodVMProvider.notifier).refresh(),
                   child: const Text('Thử lại'),
                 ),
               ],

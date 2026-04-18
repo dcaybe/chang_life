@@ -1,3 +1,4 @@
+import 'package:change_life/features/auth/providers/auth_provider.dart';
 import 'package:change_life/features/habit/providers/habit_provider.dart';
 import 'package:change_life/features/habit/widgets/habit_tile.dart';
 import 'package:change_life/features/habit/widgets/test_async.dart';
@@ -29,8 +30,8 @@ class _HomePageState extends ConsumerState<HomeScreen> {
         );
       }
     });
-    final storageService = ref.watch(storageServiceProvider);
-    final name = storageService.getUsername();
+    // Lấy tên User thời gian thực từ Provider, không gọi trực tiếp Service!
+    final name = ref.watch(currentUserProvider);
     final habits = ref.watch(habitVMProvider);
     final completed = ref.watch(countComplete);
     final total = habits.length;
@@ -73,11 +74,11 @@ class _HomePageState extends ConsumerState<HomeScreen> {
               },
             ),
           ),
-          const SizedBox(height: 20),
-          Text('Test Async'),
-          TestAsync(),
-          const SizedBox(height: 20),
-          Text(widget.userName),
+          // const SizedBox(height: 20),
+          // Text('Test Async'),
+          // TestAsync(),
+          // const SizedBox(height: 20),
+          // Text(widget.userName),
           // ElevatedButton(
           //   onPressed: () async {
           //     // Lưu tên mới
@@ -89,6 +90,7 @@ class _HomePageState extends ConsumerState<HomeScreen> {
           // ),
         ],
       ),
+      
     );
   }
 }

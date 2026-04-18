@@ -1,8 +1,16 @@
+import 'package:hive/hive.dart';
+part 'habit.g.dart';
+
+@HiveType(typeId: 1)
 class Habit {
+  @HiveField(0)
   final String id;
+  @HiveField(1)
   final String name;
+  @HiveField(2)
   final bool isDone;
   Habit({required this.name, required this.id, this.isDone = false});
+
 
   Habit copyWith({String? name, bool? isDone}) {
     return Habit(

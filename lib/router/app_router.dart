@@ -3,18 +3,29 @@ import 'package:change_life/features/goal/views/goal_detail_screen.dart';
 import 'package:change_life/features/goal/views/goal_screen.dart';
 import 'package:change_life/features/habit/models/habit.dart';
 import 'package:change_life/features/habit/views/habit_detail_screen.dart';
-import 'package:change_life/features/habit/views/home_screen.dart';
+import 'package:change_life/features/habit/views/habit_screen.dart';
 import 'package:change_life/features/nutrition/models/food.dart';
 import 'package:change_life/features/nutrition/views/nutrition_detail_screen.dart';
 import 'package:change_life/features/workout/views/workout_screen.dart';
 import 'package:change_life/views/main_screen.dart';
 import 'package:change_life/features/nutrition/views/nutrition_screen.dart';
+import 'package:change_life/features/auth/views/login_screen.dart';
+import 'package:change_life/services/setting_hive.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
-  static final router = GoRouter(
-    initialLocation: '/habit',
-    routes: [
+  static late final GoRouter router;
+
+  static void init(StorageService storageService) {
+    final token = storageService.getToken();
+    
+    router = GoRouter(
+      initialLocation: token != null ? '/habit' : '/login',
+      routes: [
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => const LoginScreen(),
+        ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainScreen(navigationShell: navigationShell);
@@ -83,4 +94,5 @@ class AppRouter {
       ),
     ],
   );
+  }
 }

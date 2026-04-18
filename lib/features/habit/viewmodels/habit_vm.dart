@@ -1,17 +1,17 @@
 import 'package:change_life/features/habit/models/habit.dart';
 import 'package:change_life/features/habit/models/todo.dart';
 import 'package:change_life/features/habit/providers/habit_provider.dart';
-import 'package:change_life/services/habit_service.dart';
+import 'package:change_life/services/habit_hive_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 
 // List habit
 class HabitViewModel extends Notifier<List<Habit>> {
   //get habits
-  late final HabitService service;
+  late final HabitHiveService service;
   @override
   List<Habit> build() {
-    service = ref.read(habitServiceProvider);
+    service = ref.read(habitHiveServiceProvider);
     return service.getHabits();
   }
 
@@ -22,10 +22,9 @@ class HabitViewModel extends Notifier<List<Habit>> {
   }
 
   //add task
-  void addHabit(String name, String id) {
-    service.addHabit(name, id);
+  void addHabit(Habit habit) {
+    service.addHabit(habit);
     state = service.getHabits();
-    ;
   }
 
   //remove task
@@ -55,4 +54,3 @@ class TestVM extends AutoDisposeAsyncNotifier<List<Todo>> {
 }
 
 // lib/viewmodels/habit_vm.dart
-

@@ -1,18 +1,18 @@
 import 'package:change_life/features/goal/models/goal.dart';
 import 'package:hive/hive.dart';
 
-class HiveService {
+class GoalHiveService {
   late Box<Goal> goalBox;
 
   Future<void> init() async {
     goalBox = await Hive.openBox<Goal>('goalBox');
   }
 
-  void addHabit(Goal habit) {
-    goalBox.add(habit);
+  void addGoal(Goal goal) {
+    goalBox.add(goal);
   }
 
-  List<Goal> getHabits() {
+  List<Goal> getGoals() {
     if (goalBox.isEmpty) {
       return [
         Goal(id: '1', title: 'Học Flutter', description: 'Hoàn thành 8 tuần'),
@@ -24,6 +24,10 @@ class HiveService {
       ];
     }
     return goalBox.values.toList();
+  }
+
+  void removeGoal(int index) {
+    goalBox.deleteAt(index);
   }
 
   Box<Goal> getBox() {

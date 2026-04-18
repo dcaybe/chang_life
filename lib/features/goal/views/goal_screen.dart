@@ -9,8 +9,8 @@ class GoalScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final goalProviders = ref.watch(hiveServiceProvider);
-    final goals = goalProviders.getHabits();
+    final goalProviders = ref.watch(goalHiveServiceProvider);
+    final goals = goalProviders.getGoals();
     return Scaffold(
       appBar: AppBar(title: const Text('Goals')),
       body: ListView.builder(

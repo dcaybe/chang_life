@@ -6,9 +6,10 @@ import 'package:change_life/features/settings/models/setting_model.dart';
 import 'package:change_life/features/settings/providers/setting_provider.dart';
 import 'package:change_life/features/settings/viewmodels/settings_vm.dart';
 import 'package:change_life/services/api_service.dart';
-import 'package:change_life/services/habit_service.dart';
+import 'package:change_life/services/habit_hive_service.dart';
 import 'package:change_life/features/habit/viewmodels/habit_vm.dart';
-import 'package:change_life/services/storage_service.dart';
+import 'package:change_life/services/setting_hive.dart';
+import 'package:change_life/services/food_hive_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final habitVMProvider = NotifierProvider<HabitViewModel, List<Habit>>(
@@ -31,24 +32,19 @@ final toggleHabitProvider = Provider((ref) {
     ref.read(habitVMProvider.notifier).toggle(id);
   };
 });
-// service
-final habitServiceProvider = Provider<HabitService>((ref) {
-  final storage = ref.read(storageServiceProvider);
-
-  return HabitService(storage.prefs());
-});
 
 // api
 final todoApiProvider = Provider<ApiService>((ref) {
   return ApiService();
 });
-final foodApiProvider = Provider<FoodApi>((ref) {
-  return FoodApi();
-});
+
 
 final testProvider = AsyncNotifierProvider.autoDispose<TestVM, List<Todo>>(
   TestVM.new,
 );
-final foodVMProvider = AsyncNotifierProvider.autoDispose<FoodVM, List<Food>>(
-  FoodVM.new,
-);
+
+final habitHiveServiceProvider = Provider<HabitHiveService>((ref) {
+  // Chúng ta sẽ "ném" ra một lỗi nếu chưa được khởi tạo ở main
+  throw UnimplementedError();
+});
+
