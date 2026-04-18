@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-part 'habit.g.dart';
+part 'habit_model.g.dart';
 
 @HiveType(typeId: 1)
 class Habit {
@@ -10,7 +10,6 @@ class Habit {
   @HiveField(2)
   final bool isDone;
   Habit({required this.name, required this.id, this.isDone = false});
-
 
   Habit copyWith({String? name, bool? isDone}) {
     return Habit(

@@ -1,5 +1,5 @@
-import 'package:change_life/features/goal/models/goal.dart';
-import 'package:change_life/features/goal/provider/goal_providers.dart';
+import 'package:change_life/features/goal/models/goal_model.dart';
+import 'package:change_life/features/goal/providers/goal_provider.dart';
 import 'package:change_life/services/goal_hive_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,4 +20,4 @@ class GoalViewModel extends Notifier<List<Goal>> {
     service.removeGoal(index);
     state = service.getGoals();
   }
-} 
+}

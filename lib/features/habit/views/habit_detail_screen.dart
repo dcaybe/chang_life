@@ -1,4 +1,4 @@
-import 'package:change_life/features/habit/models/habit.dart';
+import 'package:change_life/features/habit/models/habit_model.dart';
 import 'package:flutter/material.dart';
 
 class HabitDetailScreen extends StatelessWidget {

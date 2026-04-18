@@ -1,5 +1,5 @@
-import 'package:change_life/features/habit/models/habit.dart';
-import 'package:change_life/features/habit/models/todo.dart';
+import 'package:change_life/features/habit/models/habit_model.dart';
+import 'package:change_life/features/habit/models/todo_model.dart';
 import 'package:change_life/features/habit/providers/habit_provider.dart';
 import 'package:change_life/services/habit_hive_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,4 +53,4 @@ class TestVM extends AutoDisposeAsyncNotifier<List<Todo>> {
   }
 }
 
-// lib/viewmodels/habit_vm.dart
+// lib/viewmodels/habit_viewmodel.dart

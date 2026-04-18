@@ -1,5 +1,4 @@
-import 'package:change_life/features/goal/models/goal.dart';
-import 'package:change_life/features/goal/provider/goal_providers.dart';
+import 'package:change_life/features/goal/providers/goal_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

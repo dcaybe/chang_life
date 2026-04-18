@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:change_life/features/nutrition/models/food.dart';
-import 'package:change_life/features/habit/models/todo.dart';
+import 'package:change_life/features/nutrition/models/food_model.dart';
+import 'package:change_life/features/habit/models/todo_model.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {

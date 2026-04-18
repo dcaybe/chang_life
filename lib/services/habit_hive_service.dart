@@ -1,4 +1,4 @@
-import 'package:change_life/features/habit/models/habit.dart';
+import 'package:change_life/features/habit/models/habit_model.dart';
 import 'package:hive/hive.dart';
 
 class HabitHiveService {
@@ -30,13 +30,9 @@ class HabitHiveService {
     int index = habits.indexWhere((h) => h.id == id);
     if (index != -1) {
       final habit = habits[index];
-      habitBox.putAt(
-        index,
-        habit.copyWith(isDone: !habit.isDone),
-      );
+      habitBox.putAt(index, habit.copyWith(isDone: !habit.isDone));
     }
   }
-
 
   void removeHabit(int index) {
     habitBox.deleteAt(index);

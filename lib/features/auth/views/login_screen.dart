@@ -24,12 +24,11 @@ class LoginScreen extends ConsumerWidget {
         );
         return;
       }
-      
-      await ref.read(authVMProvider.notifier).login(
-        usernameController.text,
-        passwordController.text,
-      );
-      
+
+      await ref
+          .read(authVMProvider.notifier)
+          .login(usernameController.text, passwordController.text);
+
       if (context.mounted) {
         context.go('/habit');
       }
@@ -71,7 +70,10 @@ class LoginScreen extends ConsumerWidget {
                   ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton(
                       onPressed: login,
-                      child: const Text('Login', style: TextStyle(fontSize: 18)),
+                      child: const Text(
+                        'Login',
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ),
             ),
           ],

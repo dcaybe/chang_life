@@ -1,4 +1,4 @@
-import 'package:change_life/features/goal/models/goal.dart';
+import 'package:change_life/features/goal/models/goal_model.dart';
 import 'package:hive/hive.dart';
 
 class GoalHiveService {

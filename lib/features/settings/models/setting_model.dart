@@ -1,4 +1,3 @@
-
 class SettingsState {
   final String username;
   final bool isDarkMode;

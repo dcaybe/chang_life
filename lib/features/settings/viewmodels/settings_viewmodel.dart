@@ -2,7 +2,7 @@ import 'package:change_life/features/settings/models/setting_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:change_life/features/settings/providers/setting_provider.dart'; // Để lấy storageServiceProvider
 
-class SettingsVM extends Notifier<SettingsState> {
+class SettingsViewModel extends Notifier<SettingsState> {
   @override
   SettingsState build() {
     // 1. Lấy storageService từ ref.read

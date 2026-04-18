@@ -1,4 +1,4 @@
-import 'package:change_life/features/workout/models/workout.dart';
+import 'package:change_life/features/workout/models/workout_model.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutScreen extends StatelessWidget {

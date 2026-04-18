@@ -1,7 +1,6 @@
 import 'package:change_life/features/auth/providers/auth_provider.dart';
 import 'package:change_life/features/habit/providers/habit_provider.dart';
 import 'package:change_life/features/habit/widgets/habit_tile.dart';
-import 'package:change_life/features/habit/widgets/test_async.dart';
 import 'package:change_life/features/settings/providers/setting_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,23 +73,8 @@ class _HomePageState extends ConsumerState<HomeScreen> {
               },
             ),
           ),
-          // const SizedBox(height: 20),
-          // Text('Test Async'),
-          // TestAsync(),
-          // const SizedBox(height: 20),
-          // Text(widget.userName),
-          // ElevatedButton(
-          //   onPressed: () async {
-          //     // Lưu tên mới
-          //     await storageService.saveUsername('Hung Flutter');
-          //     // Ép màn hình vẽ lại để hiển thị tên mới
-          //     setState(() {});
-          //   },
-          //   child: const Text('Đổi tên thành Hung Flutter'),
-          // ),
         ],
       ),
-      
     );
   }
 }

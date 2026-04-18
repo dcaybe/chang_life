@@ -1,6 +1,6 @@
-import 'package:change_life/features/goal/models/goal.dart';
-import 'package:change_life/features/habit/models/habit.dart';
-import 'package:change_life/features/goal/provider/goal_providers.dart';
+import 'package:change_life/features/goal/models/goal_model.dart';
+import 'package:change_life/features/habit/models/habit_model.dart';
+import 'package:change_life/features/goal/providers/goal_provider.dart';
 import 'package:change_life/features/habit/providers/habit_provider.dart';
 import 'package:change_life/features/nutrition/providers/nutrition_provider.dart';
 import 'package:change_life/features/settings/providers/setting_provider.dart';
@@ -8,7 +8,7 @@ import 'package:change_life/router/app_router.dart';
 import 'package:change_life/services/goal_hive_service.dart';
 import 'package:change_life/services/habit_hive_service.dart';
 import 'package:change_life/services/setting_hive.dart';
-import 'package:change_life/features/nutrition/models/food.dart';
+import 'package:change_life/features/nutrition/models/food_model.dart';
 import 'package:change_life/services/food_hive_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

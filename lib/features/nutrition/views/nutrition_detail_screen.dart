@@ -1,4 +1,4 @@
-import 'package:change_life/features/nutrition/models/food.dart';
+import 'package:change_life/features/nutrition/models/food_model.dart';
 import 'package:flutter/material.dart';
 
 class NutritionDetailScreen extends StatelessWidget {
