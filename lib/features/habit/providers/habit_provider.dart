@@ -9,8 +9,9 @@ final habitVMProvider = NotifierProvider<HabitViewModel, List<Habit>>(
   HabitViewModel.new,
 );
 final countComplete = Provider<int>((ref) {
+  final now = DateTime.now();
   return ref.watch(
-    habitVMProvider.select((h) => h.where((h) => h.isDone).length),
+    habitVMProvider.select((list) => list.where((h) => h.isCompletedOn(now)).length),
   );
 });
 final habitProvider = Provider.family<Habit, String>((ref, id) {

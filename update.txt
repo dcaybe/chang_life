@@ -1,0 +1,17 @@
+tôi muốn chính sửa phần workout trước:
+Các chức năng chính:
+    Lịch tập theo tuần:
+        ngày tập (thứ 2 đến chủ nhật)
+            tên bài tập
+            số set
+            số lần thực hiện mỗi set (cho phép nhập số lần thực hiện mỗi set)
+            thời gian nghỉ giữa các set
+            mức tạ
+        có thể thêm sửa xóa bài tập trong ngày tập
+
+    Theo dõi sự tăng tiến tạ:
+        
+//habit
+chức năng chỉnh sửa: thêm sửa xóa thói quenm
+cho phép đánh tích để hoàn thành thói quen
+có phần trực quan hóa số ngày hoàn thành trong tuần, tháng năm

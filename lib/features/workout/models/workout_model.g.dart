@@ -1,32 +1,32 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'habit_model.dart';
+part of 'workout_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class HabitAdapter extends TypeAdapter<Habit> {
+class WorkoutSessionAdapter extends TypeAdapter<WorkoutSession> {
   @override
-  final int typeId = 1;
+  final int typeId = 3;
 
   @override
-  Habit read(BinaryReader reader) {
+  WorkoutSession read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Habit(
+    return WorkoutSession(
       id: fields[0] as String,
       name: fields[1] as String,
-      isDone: fields[2] as bool,
-      completedDays: (fields[3] as List?)?.cast<String>(),
-      colorValue: fields[4] as int?,
+      dayOfWeek: fields[2] as int,
+      exerciseLogs: (fields[3] as List).cast<ExerciseLog>(),
+      dateCompleted: fields[4] as DateTime?,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Habit obj) {
+  void write(BinaryWriter writer, WorkoutSession obj) {
     writer
       ..writeByte(5)
       ..writeByte(0)
@@ -34,11 +34,11 @@ class HabitAdapter extends TypeAdapter<Habit> {
       ..writeByte(1)
       ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.isDone)
+      ..write(obj.dayOfWeek)
       ..writeByte(3)
-      ..write(obj.completedDays)
+      ..write(obj.exerciseLogs)
       ..writeByte(4)
-      ..write(obj.colorValue);
+      ..write(obj.dateCompleted);
   }
 
   @override
@@ -47,7 +47,7 @@ class HabitAdapter extends TypeAdapter<Habit> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HabitAdapter &&
+      other is WorkoutSessionAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

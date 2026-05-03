@@ -30,7 +30,34 @@ class HabitHiveService {
     int index = habits.indexWhere((h) => h.id == id);
     if (index != -1) {
       final habit = habits[index];
-      habitBox.putAt(index, habit.copyWith(isDone: !habit.isDone));
+      final now = DateTime.now();
+      final dateStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+      
+      List<String> newCompletedDays = List.from(habit.completedDays);
+      bool isDoneNow = false;
+
+      if (newCompletedDays.contains(dateStr)) {
+        newCompletedDays.remove(dateStr);
+        isDoneNow = false;
+      } else {
+        newCompletedDays.add(dateStr);
+        isDoneNow = true;
+      }
+
+      habitBox.putAt(index, habit.copyWith(
+        completedDays: newCompletedDays,
+        isDone: isDoneNow, // Cập nhật isDone để đồng bộ UI cũ nếu cần
+      ));
+    }
+  }
+
+
+
+  void updateHabit(Habit habit) {
+    final habits = habitBox.values.toList();
+    int index = habits.indexWhere((h) => h.id == habit.id);
+    if (index != -1) {
+      habitBox.putAt(index, habit);
     }
   }
 
@@ -38,7 +65,16 @@ class HabitHiveService {
     habitBox.deleteAt(index);
   }
 
+  void deleteHabitById(String id) {
+    final habits = habitBox.values.toList();
+    int index = habits.indexWhere((h) => h.id == id);
+    if (index != -1) {
+      habitBox.deleteAt(index);
+    }
+  }
+
   Box<Habit> getBox() {
     return habitBox;
   }
 }
+

@@ -4,8 +4,12 @@ import 'package:change_life/features/goal/views/goal_screen.dart';
 import 'package:change_life/features/habit/models/habit_model.dart';
 import 'package:change_life/features/habit/views/habit_detail_screen.dart';
 import 'package:change_life/features/habit/views/habit_screen.dart';
+import 'package:change_life/features/habit/views/habit_statistics_screen.dart';
 import 'package:change_life/features/nutrition/models/food_model.dart';
 import 'package:change_life/features/nutrition/views/nutrition_detail_screen.dart';
+import 'package:change_life/features/workout/models/workout_model.dart';
+import 'package:change_life/features/workout/views/active_workout_screen.dart';
+import 'package:change_life/features/workout/views/workout_detail_screen.dart';
 import 'package:change_life/features/workout/views/workout_screen.dart';
 import 'package:change_life/views/main_screen.dart';
 import 'package:change_life/features/nutrition/views/nutrition_screen.dart';
@@ -35,8 +39,7 @@ class AppRouter {
               routes: [
                 GoRoute(
                   path: '/habit',
-                  builder: (context, state) =>
-                      const HomeScreen(userName: 'Hung'),
+                  builder: (context, state) => const HomeScreen(),
                   routes: [
                     GoRoute(
                       path: 'detail',
@@ -44,6 +47,10 @@ class AppRouter {
                         final habit = state.extra as Habit;
                         return HabitDetailScreen(habit: habit);
                       },
+                    ),
+                    GoRoute(
+                      path: 'statistics',
+                      builder: (context, state) => const HabitStatisticsScreen(),
                     ),
                   ],
                 ),
@@ -88,6 +95,19 @@ class AppRouter {
                 GoRoute(
                   path: '/workout',
                   builder: (context, state) => const WorkoutScreen(),
+                  routes: [
+                    GoRoute(
+                      path: 'active',
+                      builder: (context, state) => const ActiveWorkoutScreen(),
+                    ),
+                    GoRoute(
+                      path: 'detail',
+                      builder: (context, state) {
+                        final session = state.extra as WorkoutSession;
+                        return WorkoutDetailScreen(session: session);
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -14,14 +14,31 @@ class GoalHiveService {
 
   List<Goal> getGoals() {
     if (goalBox.isEmpty) {
-      return [
-        Goal(id: '1', title: 'Học Flutter', description: 'Hoàn thành 8 tuần'),
+      final initialData = [
+        Goal(
+          id: '1',
+          title: 'Học Flutter nâng cao',
+          description: 'Làm chủ Riverpod và Clean Architecture',
+          deadline: DateTime.now().add(const Duration(days: 30)),
+          subGoals: [
+            SubGoal(id: '1a', title: 'Học Provider/Riverpod', isCompleted: true),
+            SubGoal(id: '1b', title: 'Xây dựng module Goal', isCompleted: false),
+            SubGoal(id: '1c', title: 'Triển khai Hive Database', isCompleted: false),
+          ],
+        ),
         Goal(
           id: '2',
-          title: 'Tìm việc intern',
-          description: 'Apply 10 công ty',
+          title: 'Xây dựng Portfolio',
+          description: 'Chuẩn bị cho kỳ thực tập sắp tới',
+          deadline: DateTime.now().add(const Duration(days: 60)),
+          subGoals: [
+            SubGoal(id: '2a', title: 'Thiết kế UI trên Figma', isCompleted: false),
+            SubGoal(id: '2b', title: 'Viết CV chuyên nghiệp', isCompleted: false),
+          ],
         ),
       ];
+      // Save initial data to box so they get keys
+      goalBox.addAll(initialData);
     }
     return goalBox.values.toList();
   }

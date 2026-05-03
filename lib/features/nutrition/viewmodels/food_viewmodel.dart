@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:change_life/features/nutrition/models/food_model.dart';
-import 'package:change_life/features/nutrition/providers/nutrition_provider.dart';
+import 'package:change_life/features/nutrition/providers/nutrition_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FoodViewModel extends AutoDisposeAsyncNotifier<List<Food>> {

@@ -32,7 +32,18 @@ class HabitViewModel extends Notifier<List<Habit>> {
     service.removeHabit(index);
     state = service.getHabits();
   }
+
+  void deleteHabit(String id) {
+    service.deleteHabitById(id);
+    state = service.getHabits();
+  }
+
+  void updateHabit(Habit habit) {
+    service.updateHabit(habit);
+    state = service.getHabits();
+  }
 }
+
 
 //api habit
 class TestVM extends AutoDisposeAsyncNotifier<List<Todo>> {
@@ -54,3 +65,4 @@ class TestVM extends AutoDisposeAsyncNotifier<List<Todo>> {
 }
 
 // lib/viewmodels/habit_viewmodel.dart
+ 
