@@ -27,6 +27,15 @@ class HabitViewModel extends Notifier<List<Habit>> {
     state = service.getHabits();
   }
 
+  /// MVVM: ViewModel tạo Model, View chỉ truyền raw data
+  void createHabit(String name) {
+    final habit = Habit(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: name,
+    );
+    addHabit(habit);
+  }
+
   //remove task
   void removeHabit(int index) {
     service.removeHabit(index);

@@ -16,112 +16,106 @@ class _HomePageState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final habits = ref.watch(habitVMProvider);
-    final now = DateTime.now();
-    
-    // Tính toán tỉ lệ hoàn thành hôm nay
-    final completedToday = habits.where((h) => h.isCompletedOn(now)).length;
+    // Lấy tỉ lệ hoàn thành hôm nay từ Provider (MVVM)
+    final progress = ref.watch(habitProgressProvider);
+    final completedToday = ref.watch(countComplete);
     final total = habits.length;
-    final progress = total > 0 ? completedToday / total : 0.0;
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: CustomScrollView(
-        slivers: [
-          // ── Header với Tiến độ ──
-          SliverAppBar(
-            expandedHeight: 200,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Theme.of(context).colorScheme.primary,
-                      Theme.of(context).colorScheme.secondary,
-                    ],
-                  ),
-                ),
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Tiến độ hôm nay',
-                          style: TextStyle(color: Colors.white70, fontSize: 16),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '${(progress * 100).toInt()}%',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 48,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: LinearProgressIndicator(
-                            value: progress,
-                            backgroundColor: Colors.white24,
-                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                            minHeight: 8,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Đã hoàn thành $completedToday/$total thói quen',
-                          style: const TextStyle(color: Colors.white, fontSize: 13),
-                        ),
-                      ],
+      return Theme(
+        data: Theme.of(context).copyWith(
+          appBarTheme: AppBarTheme(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            foregroundColor: Theme.of(context).colorScheme.onSurface,
+            elevation: 0,
+          ),
+        ),
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).cardColor,
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.bar_chart_sharp, color: Theme.of(context).colorScheme.primary),
+              onPressed: () {
+                context.push('/habit/statistics');
+              },
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            // ── Header với Tiến độ ──
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'TODAY\'S DISCIPLINE',
+                      style: TextStyle(color: Colors.grey, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 2.0),
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${(progress * 100).toInt()}%',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 56,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 2.0,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    LinearProgressIndicator(
+                      value: progress,
+                      backgroundColor: Colors.grey.shade900,
+                      valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+                      minHeight: 12,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'COMPLETED $completedToday/$total HABITS',
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                    ),
+                  ],
                 ),
               ),
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.bar_chart_rounded, color: Colors.white),
-                onPressed: () {
-                  context.push('/habit/statistics');
-                },
-              ),
-            ],
-          ),
 
-          // ── Danh sách thói quen ──
-          SliverPadding(
-            padding: const EdgeInsets.only(top: 16, bottom: 80),
-            sliver: habits.isEmpty
-                ? SliverFillRemaining(
-                    child: Center(
+            // ── Danh sách thói quen ──
+            Expanded(
+              child: habits.isEmpty
+                  ? Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.spa_outlined, size: 64, color: Colors.grey.shade400),
+                          Icon(Icons.local_fire_department, size: 64, color: Colors.grey.shade800),
                           const SizedBox(height: 16),
-                          const Text('Bắt đầu một thói quen mới ngay!', style: TextStyle(color: Colors.grey)),
+                          Text('START BUILDING DISCIPLINE', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
                         ],
                       ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.only(top: 16, bottom: 80, left: 16, right: 16),
+                      itemCount: habits.length,
+                      itemBuilder: (context, index) => HabitTile(id: habits[index].id),
                     ),
-                  )
-                : SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => HabitTile(id: habits[index].id),
-                      childCount: habits.length,
-                    ),
-                  ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddHabitDialog(context, ref),
-        label: const Text('Thêm thói quen'),
-        icon: const Icon(Icons.add),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () => _showAddHabitDialog(context, ref),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          label: const Text('NEW HABIT', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.0)),
+          icon: const Icon(Icons.add, size: 24),
+        ),
       ),
     );
   }
@@ -131,31 +125,57 @@ class _HomePageState extends ConsumerState<HomeScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Thói quen mới'),
+        backgroundColor: Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1),
+        ),
+        title: Text('NEW HABIT', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
         content: TextField(
           controller: controller,
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'VD: Chạy bộ 30 phút...',
-            border: OutlineInputBorder(),
+          maxLength: 50,
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+          decoration: InputDecoration(
+            hintText: 'e.g. Run 5km...',
+            hintStyle: const TextStyle(color: Colors.grey),
+            counterStyle: const TextStyle(color: Colors.grey),
+            enabledBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Colors.grey)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
+          TextButton(
+            onPressed: () => Navigator.pop(context), 
+            child: const Text('CANCEL', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold))
+          ),
           ElevatedButton(
             onPressed: () {
-              if (controller.text.isNotEmpty) {
-                Habit newHabit = Habit(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
-                  name: controller.text,
-                  colorValue: Colors.primaries[DateTime.now().millisecond % Colors.primaries.length].value,
+              final name = controller.text.trim();
+              if (name.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    behavior: SnackBarBehavior.floating,
+                    margin: const EdgeInsets.all(16),
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                    content: Text(
+                      'HABIT NAME CANNOT BE EMPTY',
+                      style: TextStyle(color: Theme.of(context).colorScheme.onError, fontWeight: FontWeight.w900, letterSpacing: 1.0),
+                    ),
+                  ),
                 );
-                ref.read(habitVMProvider.notifier).addHabit(newHabit);
-                Navigator.pop(context);
+                return;
               }
+              ref.read(habitVMProvider.notifier).createHabit(name);
+              Navigator.pop(context);
             },
-            child: const Text('Thêm'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            ),
+            child: const Text('ADD', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.0)),
           ),
         ],
       ),

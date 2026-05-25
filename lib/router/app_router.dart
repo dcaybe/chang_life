@@ -7,6 +7,8 @@ import 'package:change_life/features/habit/views/habit_screen.dart';
 import 'package:change_life/features/habit/views/habit_statistics_screen.dart';
 import 'package:change_life/features/nutrition/models/food_model.dart';
 import 'package:change_life/features/nutrition/views/nutrition_detail_screen.dart';
+import 'package:change_life/features/onboarding/views/onboarding_screen.dart';
+import 'package:change_life/features/onboarding/views/splash_screen.dart';
 import 'package:change_life/features/workout/models/workout_model.dart';
 import 'package:change_life/features/workout/views/active_workout_screen.dart';
 import 'package:change_life/features/workout/views/workout_detail_screen.dart';
@@ -14,6 +16,8 @@ import 'package:change_life/features/workout/views/workout_screen.dart';
 import 'package:change_life/views/main_screen.dart';
 import 'package:change_life/features/nutrition/views/nutrition_screen.dart';
 import 'package:change_life/features/auth/views/login_screen.dart';
+import 'package:change_life/features/profile/views/profile_screen.dart';
+import 'package:change_life/features/profile/views/settings_screen.dart';
 import 'package:change_life/services/setting_hive.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,11 +25,18 @@ class AppRouter {
   static late final GoRouter router;
 
   static void init(StorageService storageService) {
-    final token = storageService.getToken();
-
+    // Splash always shows first for 2s, then navigates
     router = GoRouter(
-      initialLocation: token != null ? '/habit' : '/login',
+      initialLocation: '/splash',
       routes: [
+        GoRoute(
+          path: '/splash',
+          builder: (context, state) => const SplashScreen(),
+        ),
+        GoRoute(
+          path: '/onboarding',
+          builder: (context, state) => const OnboardingScreen(),
+        ),
         GoRoute(
           path: '/login',
           builder: (context, state) => const LoginScreen(),
@@ -106,6 +117,20 @@ class AppRouter {
                         final session = state.extra as WorkoutSession;
                         return WorkoutDetailScreen(session: session);
                       },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/profile',
+                  builder: (context, state) => const ProfileScreen(),
+                  routes: [
+                    GoRoute(
+                      path: 'settings',
+                      builder: (context, state) => const SettingsScreen(),
                     ),
                   ],
                 ),

@@ -20,6 +20,7 @@ import 'package:change_life/features/workout/models/workout_model.dart';
 import 'package:change_life/features/workout/models/exercise_model.dart';
 import 'package:change_life/services/workout_hive_service.dart';
 import 'package:change_life/features/workout/providers/workout_provider.dart';
+import 'package:change_life/theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,9 +75,9 @@ class MainApp extends ConsumerWidget {
     return MaterialApp.router(
       routerConfig: AppRouter.router,
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      theme: settings.currentTheme == AppThemeMode.sereneBlue
+          ? AppTheme.sereneBlueTheme
+          : AppTheme.kineticDisciplineTheme,
     );
   }
 }

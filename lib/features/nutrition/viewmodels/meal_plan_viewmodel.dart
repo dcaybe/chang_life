@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:change_life/features/nutrition/models/meal_plan_model.dart';
 import 'package:change_life/features/nutrition/providers/nutrition_services.dart';
+import 'package:change_life/features/settings/providers/setting_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MealPlanViewModel extends AutoDisposeAsyncNotifier<List<MealPlan>> {
@@ -89,5 +90,84 @@ class MealPlanViewModel extends AutoDisposeAsyncNotifier<List<MealPlan>> {
       await hiveService.saveMealPlans(newList);
       state = AsyncData(newList);
     }
+  }
+
+  Future<void> generateAndSaveMealPlan({
+    required int age,
+    required double height,
+    required double weight,
+    required String gender,
+    required String goal,
+    required List<String> selectedFoods,
+    required int mealsPerDay,
+  }) async {
+    double bmr;
+    if (gender == 'Nam') {
+      bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+    } else {
+      bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+    }
+
+    double tdee = bmr * 1.55; // Moderate activity default
+    int calories = tdee.round();
+
+    if (goal == 'Giảm cân') calories -= 500;
+    if (goal == 'Tăng cơ, tăng cân') calories += 500;
+
+    final storage = ref.read(storageServiceProvider);
+    await storage.setNutritionTotalCalories(calories);
+    await storage.setHasConfiguredNutrition(true);
+
+    final days = [
+      'Thứ 2',
+      'Thứ 3',
+      'Thứ 4',
+      'Thứ 5',
+      'Thứ 6',
+      'Thứ 7',
+      'Chủ Nhật'
+    ];
+    final List<MealPlan> newPlans = [];
+
+    final carbs = selectedFoods.where((f) => ['Cơm', 'Khoai lang'].contains(f)).toList();
+    if (carbs.isEmpty) carbs.add('Cơm');
+
+    final proteins = selectedFoods.where((f) => ['Ức gà', 'Thịt lợn', 'Thịt bò', 'Cá', 'Trứng'].contains(f)).toList();
+    if (proteins.isEmpty) proteins.add('Ức gà');
+
+    final others = selectedFoods.where((f) => ['Chuối', 'Lạc', 'Rau xanh'].contains(f)).toList();
+    if (others.isEmpty) others.add('Rau xanh');
+
+    for (var day in days) {
+      String breakfast = '';
+      String lunch = '';
+      String snack = '';
+      String dinner = '';
+      String lateNight = '';
+
+      breakfast = '1 phần ${carbs.first} + 1 phần ${proteins.first} + ${others.first}';
+      lunch = '1 phần ${carbs.last} + 1 phần ${proteins.last} + ${others.last}';
+      dinner = '1 phần ${carbs.first} + 1 phần ${proteins.first} + ${others.first}';
+
+      if (mealsPerDay >= 4) {
+        snack = '1 phần Trái cây/Đồ ăn nhẹ';
+      }
+      if (mealsPerDay == 5) {
+        lateNight = '1 phần ăn nhẹ trước khi ngủ';
+      }
+
+      newPlans.add(MealPlan(
+        day: day,
+        breakfast: breakfast,
+        lunch: lunch,
+        snack: snack,
+        dinner: dinner,
+        lateNight: lateNight,
+      ));
+    }
+
+    final hiveService = ref.read(nutritionHiveServiceProvider);
+    await hiveService.saveMealPlans(newPlans);
+    state = AsyncData(newPlans);
   }
 }

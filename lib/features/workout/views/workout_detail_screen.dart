@@ -31,80 +31,83 @@ class WorkoutDetailScreen extends ConsumerWidget {
           orElse: () => session, // Fallback nếu bị xoá
         );
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: Text(
-          latestSession.name,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+    return Theme(
+      data: Theme.of(context).copyWith(
+        appBarTheme: AppBarTheme(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          foregroundColor: Theme.of(context).colorScheme.onSurface,
+          elevation: 0,
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_calendar_outlined),
-            tooltip: 'Chỉnh sửa kế hoạch',
-            onPressed: () {
-              final notifier =
-                  ref.read(activeWorkoutViewModelProvider.notifier);
-              notifier.startSession(latestSession);
-              if (!ref.read(activeWorkoutViewModelProvider).isEditMode) {
-                notifier.toggleEditMode();
-              }
-              context.push('/workout/active');
-            },
-          ),
-        ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        children: [
-          // ── Summary chips ──
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: _SummaryRow(session: latestSession),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            latestSession.name.toUpperCase(),
+            style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5),
           ),
-
-          // ── Bắt đầu tập button ──
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 2,
-              ),
-              icon: const Icon(Icons.play_arrow_rounded, size: 28),
-              label: const Text(
-                'Bắt đầu tập ngay',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.edit_calendar_sharp, color: Theme.of(context).colorScheme.primary),
+              tooltip: 'Chỉnh sửa kế hoạch',
               onPressed: () {
-                final notifier = ref.read(
-                  activeWorkoutViewModelProvider.notifier,
-                );
+                final notifier = ref.read(activeWorkoutViewModelProvider.notifier);
                 notifier.startSession(latestSession);
-                if (ref.read(activeWorkoutViewModelProvider).isEditMode) {
+                if (!ref.read(activeWorkoutViewModelProvider).isEditMode) {
                   notifier.toggleEditMode();
                 }
                 context.push('/workout/active');
               },
             ),
-          ),
+          ],
+        ),
+        body: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          children: [
+            // ── Summary chips ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _SummaryRow(session: latestSession),
+            ),
 
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Divider(),
-          ),
+            // ── Bắt đầu tập button ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                  elevation: 0,
+                ),
+                icon: const Icon(Icons.play_arrow_sharp, size: 28),
+                label: const Text(
+                  'START WORKOUT',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1.5),
+                ),
+                onPressed: () {
+                  final notifier = ref.read(activeWorkoutViewModelProvider.notifier);
+                  notifier.startSession(latestSession);
+                  if (ref.read(activeWorkoutViewModelProvider).isEditMode) {
+                    notifier.toggleEditMode();
+                  }
+                  context.push('/workout/active');
+                },
+              ),
+            ),
 
-          // ── Exercise cards ──
-          ...latestSession.exerciseLogs.asMap().entries.map((entry) {
-            return _ExerciseDetailCard(log: entry.value, index: entry.key);
-          }),
-          const SizedBox(height: 32),
-        ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Divider(color: Theme.of(context).colorScheme.primary, thickness: 1),
+            ),
+
+            // ── Exercise cards ──
+            ...latestSession.exerciseLogs.asMap().entries.map((entry) {
+              return _ExerciseDetailCard(log: entry.value, index: entry.key);
+            }),
+            const SizedBox(height: 32),
+          ],
+        ),
       ),
     );
   }
@@ -163,9 +166,9 @@ class _Chip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
+        color: Colors.transparent,
+        borderRadius: BorderRadius.zero,
+        border: Border.all(color: color, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -173,11 +176,12 @@ class _Chip extends StatelessWidget {
           Icon(icon, size: 14, color: color),
           const SizedBox(width: 4),
           Text(
-            label,
+            label.toUpperCase(),
             style: TextStyle(
               fontSize: 12,
               color: color,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.0,
             ),
           ),
         ],
@@ -207,73 +211,66 @@ class _ExerciseDetailCardState extends ConsumerState<_ExerciseDetailCard> {
     final log = widget.log;
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Get historical volume data
-    final workoutHiveService = ref.read(workoutHiveServiceProvider);
-    final allSessions = workoutHiveService.getWorkouts();
-
-    final historyLogs = <_VolumePoint>[];
-    final completedSessions = allSessions
-        .where((s) => s.dateCompleted != null)
+    // Get historical volume data via ViewModel (MVVM-compliant)
+    final historyData = ref.read(workoutViewModelProvider.notifier)
+        .getExerciseVolumeHistory(log.exercise.name);
+    final historyLogs = historyData
+        .map((d) => _VolumePoint(
+              date: d['date'] as DateTime,
+              volume: d['volume'] as double,
+            ))
         .toList();
-    completedSessions.sort(
-      (a, b) => a.dateCompleted!.compareTo(b.dateCompleted!),
-    );
 
-    for (var session in completedSessions) {
-      final exerciseLogs = session.exerciseLogs.where(
-        (l) => l.exercise.name == log.exercise.name,
-      );
-      for (var exLog in exerciseLogs) {
-        if (exLog.totalVolume > 0) {
-          historyLogs.add(
-            _VolumePoint(
-              date: session.dateCompleted!,
-              volume: exLog.totalVolume,
-            ),
-          );
-        }
-      }
-    }
-
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── Header bài tập ──
             Row(
               children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: colorScheme.primary,
+                Container(
+                  width: 32,
+                  height: 32,
+                  color: Theme.of(context).colorScheme.primary,
+                  alignment: Alignment.center,
                   child: Text(
                     '${widget.index + 1}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        log.exercise.name,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                        log.exercise.name.toUpperCase(),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                       if (log.exercise.targetMuscle.isNotEmpty)
                         Text(
-                          log.exercise.targetMuscle,
+                          log.exercise.targetMuscle.toUpperCase(),
                           style: TextStyle(
                             fontSize: 12,
-                            color: colorScheme.outline,
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
                           ),
                         ),
                     ],
@@ -283,22 +280,24 @@ class _ExerciseDetailCardState extends ConsumerState<_ExerciseDetailCard> {
                 TextButton.icon(
                   onPressed: () => setState(() => _showChart = !_showChart),
                   icon: Icon(
-                    _showChart ? Icons.bar_chart : Icons.bar_chart_outlined,
-                    size: 18,
+                    _showChart ? Icons.bar_chart_sharp : Icons.bar_chart_sharp,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                   label: Text(
-                    _showChart ? 'Ẩn' : 'Lịch sử',
-                    style: const TextStyle(fontSize: 12),
+                    _showChart ? 'HIDE' : 'HISTORY',
+                    style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w900),
                   ),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     visualDensity: VisualDensity.compact,
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                   ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
 
             // ── Ghi chú bài tập ──
             if (log.notes.isNotEmpty)
@@ -415,13 +414,14 @@ class _THeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Text(
-        text,
+        text.toUpperCase(),
         style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: Colors.grey.shade600,
+          fontSize: 12,
+          fontWeight: FontWeight.w900,
+          color: Theme.of(context).colorScheme.primary,
+          letterSpacing: 1.0,
         ),
         textAlign: TextAlign.center,
       ),

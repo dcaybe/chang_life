@@ -13,6 +13,38 @@ class StorageService {
     await _settingsBox.put('user_name', name);
   }
 
+  Future<void> saveHeight(double height) async {
+    await _settingsBox.put('height', height);
+  }
+
+  double getHeight() {
+    return _settingsBox.get('height', defaultValue: 170.0);
+  }
+
+  Future<void> saveWeight(double weight) async {
+    await _settingsBox.put('weight', weight);
+  }
+
+  double getWeight() {
+    return _settingsBox.get('weight', defaultValue: 65.0);
+  }
+
+  Future<void> saveAge(int age) async {
+    await _settingsBox.put('age', age);
+  }
+
+  int getAge() {
+    return _settingsBox.get('age', defaultValue: 25);
+  }
+
+  Future<void> saveGender(String gender) async {
+    await _settingsBox.put('gender', gender);
+  }
+
+  String getGender() {
+    return _settingsBox.get('gender', defaultValue: 'Male');
+  }
+
   // Hàm đọc String: Đồng bộ (sync) - do dữ liệu đã vào RAM sau khi openBox
   String getUsername() {
     return _settingsBox.get('user_name', defaultValue: 'Guest');
@@ -39,11 +71,44 @@ class StorageService {
     return _settingsBox.get('dark_mode', defaultValue: false);
   }
 
+  Future<void> saveThemeMode(String themeName) async {
+    await _settingsBox.put('theme_mode', themeName);
+  }
+
+  String getThemeMode() {
+    return _settingsBox.get('theme_mode', defaultValue: 'kineticDiscipline');
+  }
+
   Future<void> saveClickCount(int count) async {
     await _settingsBox.put('click_count', count);
   }
 
   int getClickCount() {
     return _settingsBox.get('click_count', defaultValue: 0);
+  }
+
+  // --- ONBOARDING ---
+  bool hasSeenOnboarding() {
+    return _settingsBox.get('has_seen_onboarding', defaultValue: false);
+  }
+
+  Future<void> markOnboardingSeen() async {
+    await _settingsBox.put('has_seen_onboarding', true);
+  }
+  // --- NUTRITION ---
+  bool hasConfiguredNutrition() {
+    return _settingsBox.get('has_configured_nutrition', defaultValue: false);
+  }
+
+  Future<void> setHasConfiguredNutrition(bool value) async {
+    await _settingsBox.put('has_configured_nutrition', value);
+  }
+
+  int getNutritionTotalCalories() {
+    return _settingsBox.get('nutrition_total_calories', defaultValue: 0);
+  }
+
+  Future<void> setNutritionTotalCalories(int calories) async {
+    await _settingsBox.put('nutrition_total_calories', calories);
   }
 }

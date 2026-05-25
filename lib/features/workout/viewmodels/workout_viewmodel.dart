@@ -136,4 +136,29 @@ class WorkoutViewModel extends StateNotifier<List<WorkoutSession>> {
   List<WorkoutSession> getWorkoutsForDay(int dayOfWeek) {
     return state.where((w) => w.dayOfWeek == dayOfWeek).toList();
   }
+
+  /// Trả về lịch sử volume cho một bài tập cụ thể (đã sort theo ngày)
+  /// MVVM: Logic query/filter/sort nằm trong ViewModel, View chỉ hiển thị
+  List<Map<String, dynamic>> getExerciseVolumeHistory(String exerciseName) {
+    final completedSessions = state
+        .where((s) => s.dateCompleted != null)
+        .toList()
+      ..sort((a, b) => a.dateCompleted!.compareTo(b.dateCompleted!));
+
+    final history = <Map<String, dynamic>>[];
+    for (var session in completedSessions) {
+      final exerciseLogs = session.exerciseLogs.where(
+        (l) => l.exercise.name == exerciseName,
+      );
+      for (var exLog in exerciseLogs) {
+        if (exLog.totalVolume > 0) {
+          history.add({
+            'date': session.dateCompleted!,
+            'volume': exLog.totalVolume,
+          });
+        }
+      }
+    }
+    return history;
+  }
 }

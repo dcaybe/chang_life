@@ -16,135 +16,147 @@ class ActiveWorkoutScreen extends ConsumerWidget {
       return const Scaffold(body: Center(child: Text('No active session')));
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(activeState.isEditMode ? "Chỉnh sửa kế hoạch" : session.name),
-        actions: [
-          // Nút Lưu — chỉ hiện khi Edit Mode
-          if (activeState.isEditMode)
-            IconButton(
-              icon: const Icon(Icons.save_outlined),
-              tooltip: 'Lưu thay đổi',
-              onPressed: () {
-                final template = activeState.editedTemplate;
-                if (template != null) {
-                  ref
-                      .read(workoutViewModelProvider.notifier)
-                      .updateWorkout(template); 
-                }
-                context.pop();
-              },
-            ),
-          // Nút xóa buổi tập — chỉ hiện khi đang Edit Mode
-          if (activeState.isEditMode && activeState.templateId != null)
-            IconButton(
-              icon: const Icon(Icons.delete_forever_outlined, color: Colors.red),
-              tooltip: 'Xóa buổi tập',
-              onPressed: () async {
-                final confirmed = await showDialog<bool>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('Xóa buổi tập?'),
-                    content: Text(
-                      'Bạn có chắc muốn xóa "${session.name}" không?\nHành động này không thể hoàn tác.',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text('Huỷ'),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                        ),
-                        onPressed: () => Navigator.pop(ctx, true),
-                        child: const Text(
-                          'Xóa',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-                if (confirmed == true && context.mounted) {
-                  ref
-                      .read(workoutViewModelProvider.notifier)
-                      .deleteWorkout(activeState.templateId!);
-                  context.pop();
-                }
-              },
-            ),
-        ],
+    return Theme(
+      data: Theme.of(context).copyWith(
+        appBarTheme: AppBarTheme(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          foregroundColor: Theme.of(context).colorScheme.onSurface,
+          elevation: 0,
+        ),
       ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: session.exerciseLogs.length,
-                  itemBuilder: (context, exIndex) {
-                    final log = session.exerciseLogs[exIndex];
-                    return _ExerciseCard(exIndex: exIndex, log: log);
-                  },
-                ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            activeState.isEditMode ? "CHỈNH SỬA KẾ HOẠCH" : session.name.toUpperCase(),
+            style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5),
+          ),
+          actions: [
+            if (activeState.isEditMode)
+              IconButton(
+                icon: Icon(Icons.save_outlined, color: Theme.of(context).colorScheme.primary),
+                tooltip: 'Lưu thay đổi',
+                onPressed: () {
+                  final template = activeState.editedTemplate;
+                  if (template != null) {
+                    ref.read(workoutViewModelProvider.notifier).updateWorkout(template);
+                  }
+                  context.pop();
+                },
               ),
-              if (!activeState.isEditMode) // Chỉ hiện nút Hoàn thành khi đang tập
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: SizedBox(
+            if (activeState.isEditMode && activeState.templateId != null)
+              IconButton(
+                icon: Icon(Icons.delete_forever_outlined, color: Theme.of(context).colorScheme.error),
+                tooltip: 'Xóa buổi tập',
+                onPressed: () async {
+                  final confirmed = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      backgroundColor: Theme.of(context).cardColor,
+                      title: Text('Xóa buổi tập?', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                      content: Text(
+                        'Bạn có chắc muốn xóa "${session.name}" không?\nHành động này không thể hoàn tác.',
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx, false),
+                          child: Text('Huỷ', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.error,
+                            foregroundColor: Theme.of(context).colorScheme.onError,
+                            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                          ),
+                          onPressed: () => Navigator.pop(ctx, true),
+                          child: const Text('Xóa'),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirmed == true && context.mounted) {
+                    ref.read(workoutViewModelProvider.notifier).deleteWorkout(activeState.templateId!);
+                    context.pop();
+                  }
+                },
+              ),
+          ],
+        ),
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    itemCount: session.exerciseLogs.length,
+                    itemBuilder: (context, exIndex) {
+                      final log = session.exerciseLogs[exIndex];
+                      return _ExerciseCard(exIndex: exIndex, log: log);
+                    },
+                  ),
+                ),
+                if (!activeState.isEditMode) // Chỉ hiện nút Hoàn thành khi đang tập
+                  Container(
                     width: double.infinity,
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    padding: const EdgeInsets.all(16.0),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: activeState.allSetsCompleted
-                            ? Colors.green
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).cardColor,
+                        foregroundColor: activeState.allSetsCompleted
+                            ? Theme.of(context).colorScheme.onPrimary
                             : Colors.grey,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                          side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        elevation: 0,
                       ),
-                      // Chỉ cho bấm khi tất cả set đã hoàn thành
                       onPressed: activeState.allSetsCompleted
                           ? () {
-                              final hiveService = ref.read(
-                                workoutHiveServiceProvider,
-                              );
-                              ref
-                                  .read(activeWorkoutViewModelProvider.notifier)
-                                  .finishSession(hiveService);
+                              ref.read(activeWorkoutViewModelProvider.notifier).finishSession();
                               context.pop();
                             }
                           : null,
-                      child: const Text(
-                        'HOÀN THÀNH BUỔI TẬP',
+                      child: Text(
+                        'LOG WORKOUT',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.5,
+                          color: activeState.allSetsCompleted ? Theme.of(context).colorScheme.onPrimary : Colors.grey,
                         ),
                       ),
                     ),
                   ),
-                ),
-            ],
-          ),
+              ],
+            ),
 
-          if (activeState.isTimerActive)
-            Positioned(
-              bottom: 100,
-              left: 20,
-              right: 20,
-              child: _RestTimerOverlay(seconds: activeState.restTimerSeconds),
-            ),
-          if (activeState.isEditMode)
-            Positioned(
-              bottom: 80,
-              right: 20,
-              child: FloatingActionButton(
-                backgroundColor: Colors.blue,
-                onPressed: () => _showAddExerciseDialog(context, ref),
-                child: const Icon(Icons.add, color: Colors.white),
+            if (activeState.isTimerActive)
+              Positioned(
+                bottom: activeState.isEditMode ? 20 : 100,
+                left: 16,
+                right: 16,
+                child: _RestTimerOverlay(seconds: activeState.restTimerSeconds),
               ),
-            ),
-        ],
+            if (activeState.isEditMode)
+              Positioned(
+                bottom: 20,
+                right: 16,
+                child: FloatingActionButton(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                  onPressed: () => _showAddExerciseDialog(context, ref),
+                  child: const Icon(Icons.add, size: 32),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -179,10 +191,15 @@ class _ExerciseCard extends ConsumerWidget {
     final isEditMode = activeState.isEditMode;
 
     return Card(
-      margin: const EdgeInsets.all(8),
-      elevation: 2,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 0,
+      color: Theme.of(context).cardColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero,
+        side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -193,25 +210,33 @@ class _ExerciseCard extends ConsumerWidget {
                     ? Expanded(
                         child: TextFormField(
                           initialValue: log.exercise.name,
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
                           onChanged: (val) => ref
                               .read(activeWorkoutViewModelProvider.notifier)
                               .renameExercise(exIndex, val),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Exercise Name',
+                            labelStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
+                            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
                           ),
                         ),
                       )
-                    : Text(
-                        log.exercise.name,
-                        style: Theme.of(context).textTheme.titleLarge,
+                    : Expanded(
+                        child: Text(
+                          log.exercise.name.toUpperCase(),
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
                       ),
                 if (isEditMode)
                   IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    icon: Icon(Icons.delete_outline, color: Theme.of(context).colorScheme.error),
                     onPressed: () {
-                      ref
-                          .read(activeWorkoutViewModelProvider.notifier)
-                          .deleteExercise(exIndex);
+                      ref.read(activeWorkoutViewModelProvider.notifier).deleteExercise(exIndex);
                     },
                   ),
               ],
@@ -219,16 +244,17 @@ class _ExerciseCard extends ConsumerWidget {
             // Note Field
             TextFormField(
               initialValue: log.notes,
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), fontSize: 14),
               onChanged: (val) => ref
                   .read(activeWorkoutViewModelProvider.notifier)
                   .updateExerciseNote(exIndex, val),
               decoration: const InputDecoration(
-                hintText: 'Ghi chú cho bài tập này...',
+                hintText: 'Notes...',
+                hintStyle: TextStyle(color: Colors.grey),
                 isDense: true,
-                prefixIcon: Icon(Icons.notes, size: 18),
+                prefixIcon: Icon(Icons.notes, size: 18, color: Colors.grey),
                 border: InputBorder.none,
               ),
-              style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
             ),
             // Stepper chỉnh thời gian nghỉ — chỉ hiện trong Edit Mode
             if (isEditMode)
@@ -236,11 +262,11 @@ class _ExerciseCard extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(vertical: 6),
                 child: Row(
                   children: [
-                    const Icon(Icons.timer_outlined, size: 18, color: Colors.blue),
+                    Icon(Icons.timer_outlined, size: 18, color: Theme.of(context).colorScheme.primary),
                     const SizedBox(width: 6),
-                    const Text(
-                      'Thời gian nghỉ:',
-                      style: TextStyle(fontSize: 13),
+                    Text(
+                      'Rest Time:',
+                      style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface),
                     ),
                     const SizedBox(width: 8),
                     // Nút giảm
@@ -253,123 +279,136 @@ class _ExerciseCard extends ConsumerWidget {
                   ],
                 ),
               ),
-            const Divider(),
+            const Divider(color: Colors.grey, height: 24),
+            // Table Header
+            Row(
+              children: [
+                const SizedBox(width: 40, child: Text('SET', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold))),
+                const Expanded(child: Text('KG', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold))),
+                const Expanded(child: Text('REPS', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold))),
+                const SizedBox(width: 40, child: Icon(Icons.check, color: Colors.grey, size: 20)),
+              ],
+            ),
+            const SizedBox(height: 8),
             ...log.sets.asMap().entries.map((entry) {
               final setIndex = entry.key;
               final workoutSet = entry.value;
               final bool isCompleted = workoutSet.isCompleted;
 
-              return Opacity(
-                opacity: isCompleted ? 0.5 : 1.0, // Làm mờ nếu đã hoàn thành
+              return Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
+                  color: isCompleted ? Theme.of(context).colorScheme.primary.withOpacity(0.1) : Colors.transparent,
+                  border: Border.all(
+                    color: isCompleted ? Theme.of(context).colorScheme.primary : Colors.grey.shade800,
+                    width: 1,
+                  ),
+                ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                   child: Row(
                     children: [
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          CircleAvatar(
-                            radius: 14,
-                            backgroundColor: isCompleted
-                                ? Colors.green
-                                : Colors.grey[300],
-                            child: Text(
+                      // Set number
+                      SizedBox(
+                        width: 32,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.center,
+                          children: [
+                            Text(
                               '${setIndex + 1}',
                               style: TextStyle(
-                                fontSize: 12,
-                                color: isCompleted ? Colors.white : Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900,
+                                color: isCompleted ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
-                          ),
-                          if (workoutSet.isPR == true)
-                            const Positioned(
-                              top: -6,
-                              right: -6,
-                              child: Icon(
-                                Icons.workspace_premium,
-                                color: Colors.amber,
-                                size: 16,
+                            if (workoutSet.isPR == true)
+                              const Positioned(
+                                top: -10,
+                                right: -4,
+                                child: Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
+                                  size: 14,
+                                ),
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
                       ),
-                      const SizedBox(width: 10),
-                      // Weight: Only editable in Edit Mode
+                      const SizedBox(width: 8),
+                      // Weight
                       Expanded(
                         child: TextFormField(
                           initialValue: workoutSet.weight.toString(),
                           keyboardType: TextInputType.number,
                           enabled: isEditMode && !isCompleted,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.bold,
+                            decoration: isCompleted ? TextDecoration.lineThrough : null,
+                          ),
                           decoration: InputDecoration(
-                            suffixText: 'kg',
-                            border: const OutlineInputBorder(),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 0,
-                            ),
-                            fillColor: (isEditMode && !isCompleted)
-                                ? null
-                                : Colors.grey[100],
-                            filled: true,
+                            border: InputBorder.none,
+                            isDense: true,
+                            fillColor: isEditMode && !isCompleted ? Theme.of(context).colorScheme.onSurface.withOpacity(0.1) : Colors.transparent,
+                            filled: isEditMode && !isCompleted,
                           ),
                           onChanged: (val) {
                             double? w = double.tryParse(val);
                             if (w != null) {
-                              ref
-                                  .read(activeWorkoutViewModelProvider.notifier)
-                                  .updateSet(
-                                    exIndex,
-                                    setIndex,
-                                    w,
-                                    workoutSet.reps,
-                                  );
+                              ref.read(activeWorkoutViewModelProvider.notifier).updateSet(exIndex, setIndex, w, workoutSet.reps);
                             }
                           },
                         ),
                       ),
                       const SizedBox(width: 8),
-                      // Reps: Always editable unless completed
+                      // Reps
                       Expanded(
                         child: TextFormField(
                           initialValue: workoutSet.reps.toString(),
                           keyboardType: TextInputType.number,
                           enabled: !isCompleted,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.bold,
+                            decoration: isCompleted ? TextDecoration.lineThrough : null,
+                          ),
                           decoration: const InputDecoration(
-                            suffixText: 'reps',
-                            border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 0,
-                            ),
+                            border: InputBorder.none,
+                            isDense: true,
                           ),
                           onChanged: (val) {
                             int? r = int.tryParse(val);
                             if (r != null) {
-                              ref
-                                  .read(activeWorkoutViewModelProvider.notifier)
-                                  .updateSet(
-                                    exIndex,
-                                    setIndex,
-                                    workoutSet.weight,
-                                    r,
-                                  );
+                              ref.read(activeWorkoutViewModelProvider.notifier).updateSet(exIndex, setIndex, workoutSet.weight, r);
                             }
                           },
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Checkbox(
-                        value: isCompleted,
-                        // Disable khi: Edit Mode, đã hoàn thành, HOẶC đang trong thời gian nghỉ
-                        onChanged: (isEditMode || isCompleted || activeState.isTimerActive)
+                      // Checkbox equivalent
+                      InkWell(
+                        onTap: (isEditMode || activeState.isTimerActive && !isCompleted)
                             ? null
-                            : (val) {
-                                ref
-                                    .read(
-                                      activeWorkoutViewModelProvider.notifier,
-                                    )
-                                    .toggleSet(exIndex, setIndex);
+                            : () {
+                                ref.read(activeWorkoutViewModelProvider.notifier).toggleSet(exIndex, setIndex);
                               },
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: isCompleted ? Theme.of(context).colorScheme.primary : Colors.grey.shade800,
+                            borderRadius: BorderRadius.zero,
+                          ),
+                          child: Icon(
+                            Icons.check,
+                            color: isCompleted ? Theme.of(context).colorScheme.onPrimary : Colors.transparent,
+                            size: 20,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -379,13 +418,20 @@ class _ExerciseCard extends ConsumerWidget {
 
             if (isEditMode)
               Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: TextButton.icon(
-                  onPressed: () => ref
-                      .read(activeWorkoutViewModelProvider.notifier)
-                      .addSet(exIndex),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Thêm hiệp tập'),
+                padding: const EdgeInsets.only(top: 12),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => ref
+                        .read(activeWorkoutViewModelProvider.notifier)
+                        .addSet(exIndex),
+                    icon: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
+                    label: Text('THÊM HIỆP TẬP', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                    ),
+                  ),
                 ),
               ),
           ],
@@ -425,12 +471,13 @@ class _RestStepper extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
-            borderRadius: BorderRadius.circular(8),
+            color: Colors.transparent,
+            border: Border.all(color: Theme.of(context).colorScheme.primary),
+            borderRadius: BorderRadius.zero,
           ),
           child: Text(
             _label(value),
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Theme.of(context).colorScheme.primary),
           ),
         ),
         IconButton(
@@ -697,26 +744,38 @@ class _RestTimerOverlay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Format mm:ss
+    final m = (seconds ~/ 60).toString().padLeft(2, '0');
+    final s = (seconds % 60).toString().padLeft(2, '0');
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.8),
-        borderRadius: BorderRadius.circular(16),
+        color: Theme.of(context).scaffoldBackgroundColor,
+        border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Icon(Icons.timer_outlined, color: Colors.orangeAccent),
+          Icon(Icons.timer, color: Theme.of(context).colorScheme.primary, size: 32),
           Text(
-            'Thời gian nghỉ: $seconds giây',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+            'REST: $m:$s',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 2.0,
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close, color: Colors.white70),
+            icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface, size: 28),
             onPressed: () =>
                 ref.read(activeWorkoutViewModelProvider.notifier).stopTimer(),
           ),

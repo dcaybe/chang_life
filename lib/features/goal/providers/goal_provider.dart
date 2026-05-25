@@ -8,3 +8,13 @@ final goalHiveServiceProvider = Provider<GoalHiveService>((ref) {
 });
 
 final goalVMProvider = NotifierProvider<GoalViewModel, List<Goal>>(GoalViewModel.new);
+
+final inProgressGoalsProvider = Provider<List<Goal>>((ref) {
+  final goals = ref.watch(goalVMProvider);
+  return goals.where((g) => g.progress < 1).toList();
+});
+
+final completedGoalsProvider = Provider<List<Goal>>((ref) {
+  final goals = ref.watch(goalVMProvider);
+  return goals.where((g) => g.progress == 1 && g.subGoals.isNotEmpty).toList();
+});

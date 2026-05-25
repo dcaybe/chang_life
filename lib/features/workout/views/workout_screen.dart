@@ -51,25 +51,45 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Workout Schedule'),
-        bottom: TabBar(
+    return Theme(
+      data: Theme.of(context).copyWith(
+        appBarTheme: AppBarTheme(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          foregroundColor: Theme.of(context).colorScheme.onSurface,
+          elevation: 0,
+        ),
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'WORKOUT SCHEDULE',
+            style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5),
+          ),
+          bottom: TabBar(
+            controller: _tabController,
+            isScrollable: true,
+            indicatorColor: Theme.of(context).colorScheme.primary,
+            indicatorWeight: 3,
+            labelColor: Theme.of(context).colorScheme.primary,
+            unselectedLabelColor: Colors.grey.shade600,
+            labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+            tabs: _days.map((day) => Tab(text: day.toUpperCase())).toList(),
+          ),
+        ),
+        body: TabBarView(
           controller: _tabController,
-          isScrollable: true,
-          tabs: _days.map((day) => Tab(text: day)).toList(),
+          children: List.generate(
+            7,
+            (index) => _WorkoutDayList(dayOfWeek: index + 1),
+          ),
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: List.generate(
-          7,
-          (index) => _WorkoutDayList(dayOfWeek: index + 1),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _showAddWorkoutDialog,
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          child: const Icon(Icons.add, size: 32),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddWorkoutDialog,
-        child: const Icon(Icons.add),
       ),
     );
   }
@@ -173,6 +193,11 @@ class _AddWorkoutDialogState extends State<_AddWorkoutDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero,
+        side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1),
+      ),
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Form(
         key: _formKey,
@@ -184,22 +209,12 @@ class _AddWorkoutDialogState extends State<_AddWorkoutDialog> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
-                ),
+                color: Theme.of(context).cardColor,
+                border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.primary)),
               ),
-              child: Row(
-                children: [
-                  const Icon(Icons.fitness_center),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Tạo buổi tập mới',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+              child: Text(
+                'CREATE WORKOUT',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 18),
               ),
             ),
 
@@ -214,63 +229,80 @@ class _AddWorkoutDialogState extends State<_AddWorkoutDialog> {
                     TextFormField(
                       controller: _sessionNameController,
                       autofocus: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Tên buổi tập *',
-                        hintText: 'VD: Push Day, Leg Day...',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.label_outline),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+                      decoration: InputDecoration(
+                        labelText: 'WORKOUT NAME',
+                        labelStyle: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                        hintText: 'E.G. LEG DAY...',
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        enabledBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Colors.grey)),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
                       ),
                       validator: (v) => (v == null || v.trim().isEmpty)
-                          ? 'Không được để trống'
+                          ? 'REQUIRED'
                           : null,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
 
                     // Chọn ngày tập
-                    Text(
-                      'Ngày tập',
-                      style: Theme.of(context).textTheme.labelLarge,
+                    const Text(
+                      'DAY OF WEEK',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, letterSpacing: 1.5),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     Wrap(
-                      spacing: 6,
+                      spacing: 8,
+                      runSpacing: 8,
                       children: List.generate(7, (i) {
                         final day = i + 1;
                         final selected = _selectedDay == day;
-                        return ChoiceChip(
-                          label: Text(_dayNames[i]),
-                          selected: selected,
-                          onSelected: (_) => setState(() => _selectedDay = day),
+                        return GestureDetector(
+                          onTap: () => setState(() => _selectedDay = day),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: selected ? Theme.of(context).colorScheme.primary : Theme.of(context).cardColor,
+                              border: Border.all(color: selected ? Theme.of(context).colorScheme.primary : Colors.grey.shade800),
+                            ),
+                            child: Text(
+                              _dayNames[i].toUpperCase(),
+                              style: TextStyle(
+                                color: selected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ),
                         );
                       }),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 32),
 
                     // Danh sách bài tập
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Bài tập (${_exercises.length})',
-                          style: Theme.of(context).textTheme.titleMedium,
+                          'EXERCISES (${_exercises.length})',
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, letterSpacing: 1.5),
                         ),
                         TextButton.icon(
                           onPressed: _addExercise,
-                          icon: const Icon(Icons.add, size: 18),
-                          label: const Text('Thêm bài'),
+                          icon: Icon(Icons.add, size: 18, color: Theme.of(context).colorScheme.primary),
+                          label: Text('ADD EXERCISE', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
                         ),
                       ],
                     ),
-                    const Divider(height: 8),
+                    Divider(color: Theme.of(context).colorScheme.primary, height: 16),
 
                     if (_exercises.isEmpty)
                       const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(vertical: 24),
                         child: Center(
                           child: Text(
-                            'Chưa có bài tập nào.\nNhấn "Thêm bài" để bắt đầu.',
+                            'NO EXERCISES YET.\nTAP "ADD EXERCISE" TO START.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey),
+                            style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 1.0),
                           ),
                         ),
                       ),
@@ -289,21 +321,40 @@ class _AddWorkoutDialogState extends State<_AddWorkoutDialog> {
             ),
 
             // ── Footer ──
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                border: Border(top: BorderSide(color: Theme.of(context).colorScheme.primary)),
+              ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Huỷ'),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.onSurface,
+                        side: BorderSide(color: Theme.of(context).colorScheme.onSurface, width: 1),
+                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text('CANCEL', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  ElevatedButton.icon(
-                    onPressed: _save,
-                    icon: const Icon(Icons.save_alt),
-                    label: const Text('Lưu buổi tập'),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton(
+                      onPressed: _save,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text('SAVE WORKOUT', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 16)),
+                    ),
                   ),
                 ],
               ),
@@ -354,73 +405,80 @@ class _ExerciseEntryCardState extends State<_ExerciseEntryCard> {
   @override
   Widget build(BuildContext context) {
     final entry = widget.entry;
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.grey.shade300),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        border: Border.all(color: Colors.grey.shade800),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Tiêu đề + nút xoá
             Row(
               children: [
-                CircleAvatar(
-                  radius: 12,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  color: Theme.of(context).colorScheme.primary,
                   child: Text(
                     '${widget.index + 1}',
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.w900),
                   ),
                 ),
-                const SizedBox(width: 8),
-                const Text(
-                  'Bài tập',
-                  style: TextStyle(fontWeight: FontWeight.w600),
+                const SizedBox(width: 12),
+                Text(
+                  'EXERCISE',
+                  style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface, letterSpacing: 1.5),
                 ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(
-                    Icons.delete_outline,
-                    color: Colors.red,
-                    size: 20,
+                  icon: Icon(
+                    Icons.close_sharp,
+                    color: Theme.of(context).colorScheme.error,
+                    size: 24,
                   ),
                   visualDensity: VisualDensity.compact,
                   onPressed: widget.onRemove,
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
 
             // Tên bài tập
             TextFormField(
               controller: entry.nameController,
-              decoration: const InputDecoration(
-                labelText: 'Tên bài tập *',
-                hintText: 'VD: Bench Press, Squat...',
-                border: OutlineInputBorder(),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+              decoration: InputDecoration(
+                labelText: 'EXERCISE NAME *',
+                labelStyle: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                hintText: 'E.G. BENCH PRESS...',
+                hintStyle: const TextStyle(color: Colors.grey),
+                enabledBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Colors.grey)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
                 isDense: true,
               ),
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Nhập tên bài tập' : null,
+                  (v == null || v.trim().isEmpty) ? 'REQUIRED' : null,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
 
             // Nhóm cơ
             TextFormField(
               controller: entry.muscleController,
-              decoration: const InputDecoration(
-                labelText: 'Nhóm cơ (tuỳ chọn)',
-                hintText: 'VD: Chest, Back, Legs...',
-                border: OutlineInputBorder(),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+              decoration: InputDecoration(
+                labelText: 'MUSCLE GROUP (OPTIONAL)',
+                labelStyle: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                hintText: 'E.G. CHEST, BACK...',
+                hintStyle: const TextStyle(color: Colors.grey),
+                enabledBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Colors.grey)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
                 isDense: true,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
 
             // Số hiệp / kg / reps
             Row(
@@ -428,27 +486,27 @@ class _ExerciseEntryCardState extends State<_ExerciseEntryCard> {
                 // Số hiệp
                 Expanded(
                   child: _NumberField(
-                    label: 'Số hiệp',
+                    label: 'SETS',
                     value: entry.sets,
                     min: 1,
                     max: 20,
                     onChanged: (v) => setState(() => entry.sets = v),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 // Cân nặng
                 Expanded(
                   child: _NumberFieldDouble(
-                    label: 'Kg',
+                    label: 'WEIGHT (KG)',
                     value: entry.weight,
                     onChanged: (v) => setState(() => entry.weight = v),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 // Số lần
                 Expanded(
                   child: _NumberField(
-                    label: 'Reps',
+                    label: 'REPS',
                     value: entry.reps,
                     min: 1,
                     max: 200,
@@ -487,16 +545,18 @@ class _NumberField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+        Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
         const SizedBox(height: 4),
         Container(
+          height: 40,
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade400),
-            borderRadius: BorderRadius.circular(8),
+            color: Theme.of(context).cardColor,
+            border: Border.all(color: Colors.grey.shade700),
           ),
           child: Row(
             children: [
               _iconBtn(
+                context,
                 Icons.remove,
                 value > min ? () => onChanged(value - 1) : null,
               ),
@@ -504,10 +564,11 @@ class _NumberField extends StatelessWidget {
                 child: Text(
                   '$value',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                 ),
               ),
               _iconBtn(
+                context,
                 Icons.add,
                 value < max ? () => onChanged(value + 1) : null,
               ),
@@ -518,15 +579,16 @@ class _NumberField extends StatelessWidget {
     );
   }
 
-  Widget _iconBtn(IconData icon, VoidCallback? onTap) {
+  Widget _iconBtn(BuildContext context, IconData icon, VoidCallback? onTap) {
     return InkWell(
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      child: Container(
+        color: onTap != null ? Colors.grey.shade800 : Colors.transparent,
+        padding: const EdgeInsets.all(4),
         child: Icon(
           icon,
           size: 16,
-          color: onTap != null ? null : Colors.grey.shade300,
+          color: onTap != null ? Theme.of(context).colorScheme.onSurface : Colors.grey.shade800,
         ),
       ),
     );
@@ -575,25 +637,30 @@ class _NumberFieldDoubleState extends State<_NumberFieldDouble> {
       children: [
         Text(
           widget.label,
-          style: const TextStyle(fontSize: 11, color: Colors.grey),
+          style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 1.0),
         ),
         const SizedBox(height: 4),
-        TextFormField(
-          controller: _ctrl,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(
-            suffixText: 'kg',
-            isDense: true,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 8,
+        SizedBox(
+          height: 40,
+          child: TextFormField(
+            controller: _ctrl,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 16),
+            textAlign: TextAlign.center,
+            decoration: InputDecoration(
+              isDense: true,
+              border: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Colors.grey.shade700)),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Colors.grey.shade700)),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              filled: true,
+              fillColor: Theme.of(context).cardColor,
             ),
+            onChanged: (v) {
+              final parsed = double.tryParse(v);
+              if (parsed != null) widget.onChanged(parsed);
+            },
           ),
-          onChanged: (v) {
-            final parsed = double.tryParse(v);
-            if (parsed != null) widget.onChanged(parsed);
-          },
         ),
       ],
     );
@@ -615,16 +682,25 @@ class _WorkoutDayList extends ConsumerWidget {
         .toList();
 
     if (dayWorkouts.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.event_busy_outlined, size: 48, color: Colors.grey),
-            SizedBox(height: 12),
+            Icon(Icons.fitness_center, size: 64, color: Colors.grey.shade800),
+            const SizedBox(height: 16),
             Text(
-              'Chưa có buổi tập nào.\nNhấn + để thêm buổi tập mới.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
+              'NO WORKOUTS',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.2,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'TAP + TO BUILD YOUR DISCIPLINE',
+              style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
             ),
           ],
         ),
@@ -632,150 +708,166 @@ class _WorkoutDayList extends ConsumerWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       itemCount: dayWorkouts.length,
       itemBuilder: (context, index) {
         final workout = dayWorkouts[index];
         return Card(
-          elevation: 2,
-          margin: const EdgeInsets.symmetric(vertical: 8),
+          elevation: 0,
+          color: Theme.of(context).cardColor,
+          margin: const EdgeInsets.only(bottom: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.zero,
+            side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1),
           ),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
-            // Tap bìa → vào màn chi tiết
             onTap: () => context.push('/workout/detail', extra: workout),
             child: Padding(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ── Header ──
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircleAvatar(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                        child: Icon(
-                          Icons.fitness_center,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              workout.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 17,
+                              workout.name.toUpperCase(),
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 22,
+                                letterSpacing: 0.5,
                               ),
                             ),
+                            const SizedBox(height: 4),
                             Text(
-                              '${workout.exerciseLogs.length} bài tập',
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 13,
+                              '${workout.exerciseLogs.length} EXERCISES',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                letterSpacing: 1.0,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const Icon(Icons.chevron_right, color: Colors.grey),
+                      Icon(Icons.arrow_forward_ios, color: Theme.of(context).colorScheme.primary, size: 16),
                     ],
                   ),
-
-                  const SizedBox(height: 10),
-
+                  const SizedBox(height: 16),
                   // ── Preview bài tập ──
-                  ...workout.exerciseLogs.take(3).map(
+                  ...workout.exerciseLogs.take(4).map(
                     (log) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2),
+                      padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Row(
                         children: [
-                          const Icon(Icons.circle, size: 6, color: Colors.grey),
-                          const SizedBox(width: 8),
+                          Icon(Icons.square, size: 8, color: Theme.of(context).colorScheme.primary),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              log.exercise.name,
-                              style: const TextStyle(fontSize: 13),
+                              log.exercise.name.toUpperCase(),
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                           Text(
-                            '${log.sets.length} × ${log.sets.first.weight}kg',
+                            log.sets.isNotEmpty ? '${log.sets.length} × ${log.sets.first.weight}KG' : '${log.sets.length} SETS',
                             style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade600,
+                              color: Colors.grey.shade500,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-
-                  if (workout.exerciseLogs.length > 3)
+                  if (workout.exerciseLogs.length > 4)
                     Padding(
-                      padding: const EdgeInsets.only(top: 2),
+                      padding: const EdgeInsets.only(top: 8),
                       child: Text(
-                        '+ ${workout.exerciseLogs.length - 3} bài nữa...',
-                        style: const TextStyle(
+                        '+ ${workout.exerciseLogs.length - 4} MORE...',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
                           fontSize: 12,
-                          color: Colors.grey,
-                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-
-                  const Divider(height: 20),
-
+                  const SizedBox(height: 24),
                   // ── Action row ──
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       // Nút Chỉnh sửa
-                      TextButton.icon(
-                        onPressed: () {
-                          final notifier = ref.read(
-                            activeWorkoutViewModelProvider.notifier,
-                          );
-                          notifier.startSession(workout);
-                          if (!ref
-                              .read(activeWorkoutViewModelProvider)
-                              .isEditMode) {
-                            notifier.toggleEditMode();
-                          }
-                          context.push('/workout/active');
-                        },
-                        icon: const Icon(Icons.edit_calendar),
-                        label: const Text('Chỉnh sửa'),
-                      ),
-                      // Nút Bắt đầu tập
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          final notifier = ref.read(
-                            activeWorkoutViewModelProvider.notifier,
-                          );
-                          notifier.startSession(workout);
-                          if (ref
-                              .read(activeWorkoutViewModelProvider)
-                              .isEditMode) {
-                            notifier.toggleEditMode();
-                          }
-                          context.push('/workout/active');
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                      Expanded(
+                        flex: 1,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            final notifier = ref.read(
+                              activeWorkoutViewModelProvider.notifier,
+                            );
+                            notifier.startSession(workout);
+                            if (!ref
+                                .read(activeWorkoutViewModelProvider)
+                                .isEditMode) {
+                              notifier.toggleEditMode();
+                            }
+                            context.push('/workout/active');
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Theme.of(context).colorScheme.onSurface,
+                            side: BorderSide(color: Theme.of(context).colorScheme.onSurface, width: 1),
+                            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          child: const Text(
+                            'EDIT',
+                            style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.0),
                           ),
                         ),
-                        icon: const Icon(Icons.play_arrow, color: Colors.white),
-                        label: const Text(
-                          'Bắt đầu tập',
-                          style: TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(width: 12),
+                      // Nút Bắt đầu tập
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            final notifier = ref.read(
+                              activeWorkoutViewModelProvider.notifier,
+                            );
+                            notifier.startSession(workout);
+                            if (ref
+                                .read(activeWorkoutViewModelProvider)
+                                .isEditMode) {
+                              notifier.toggleEditMode();
+                            }
+                            context.push('/workout/active');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            elevation: 0,
+                          ),
+                          child: const Text(
+                            'START WORKOUT',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 16,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
                         ),
                       ),
                     ],

@@ -17,6 +17,34 @@ class GoalViewModel extends Notifier<List<Goal>> {
     state = service.getGoals();
   }
 
+  /// MVVM: ViewModel tạo Model, View chỉ truyền raw data
+  void createGoal({
+    required String title,
+    required String description,
+    required DateTime deadline,
+  }) {
+    final goal = Goal(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: title,
+      description: description,
+      deadline: deadline,
+      subGoals: [],
+    );
+    addGoal(goal);
+  }
+
+  /// MVVM: ViewModel xử lý thêm SubGoal, View chỉ truyền title
+  void addSubGoal(Goal goal, String title) {
+    final newSubGoal = SubGoal(
+      id: DateTime.now().toString(),
+      title: title,
+    );
+    final updatedGoal = goal.copyWith(
+      subGoals: [...goal.subGoals, newSubGoal],
+    );
+    updateGoal(goal.key, updatedGoal);
+  }
+
   void removeGoal(int index) {
     service.removeGoal(index);
     state = service.getGoals();

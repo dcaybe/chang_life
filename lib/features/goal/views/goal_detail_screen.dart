@@ -17,22 +17,32 @@ class GoalDetailScreen extends ConsumerWidget {
         goals.firstWhere((g) => g.id == goal.id, orElse: () => goal);
     final isCompleted = currentGoal.progress == 1;
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: Text(isCompleted ? 'Thành tựu' : 'Chi tiết mục tiêu'),
-        elevation: 0,
-        backgroundColor: isCompleted ? Colors.amber[700] : null,
-        foregroundColor: isCompleted ? Colors.white : null,
-        actions: [
-          IconButton(
-            onPressed: () => _showEditGoalDialog(context, ref, currentGoal),
-            icon: const Icon(Icons.edit_rounded),
-            tooltip: 'Sửa thông tin',
-          ),
-          const SizedBox(width: 8),
-        ],
+    return Theme(
+      data: Theme.of(context).copyWith(
+        appBarTheme: AppBarTheme(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          foregroundColor: Theme.of(context).colorScheme.onSurface,
+          elevation: 0,
+        ),
       ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            isCompleted ? 'ACHIEVEMENT' : 'GOAL DETAIL',
+            style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5),
+          ),
+          backgroundColor: isCompleted ? Colors.amber[900] : Theme.of(context).scaffoldBackgroundColor,
+          foregroundColor: Theme.of(context).colorScheme.onSurface,
+          actions: [
+            IconButton(
+              onPressed: () => _showEditGoalDialog(context, ref, currentGoal),
+              icon: const Icon(Icons.edit_sharp),
+              color: isCompleted ? Colors.white : Theme.of(context).colorScheme.primary,
+              tooltip: 'Edit Goal',
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
@@ -44,10 +54,12 @@ class GoalDetailScreen extends ConsumerWidget {
                   _buildHeader(context, currentGoal, isCompleted),
                   const SizedBox(height: 32),
                   Text(
-                    isCompleted ? 'Các nhiệm vụ đã hoàn thành' : 'Nhiệm vụ nhỏ',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                    isCompleted ? 'COMPLETED TASKS' : 'SUB TASKS',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -75,8 +87,12 @@ class GoalDetailScreen extends ConsumerWidget {
           ? null
           : FloatingActionButton(
               onPressed: () => _showAddSubGoalDialog(context, ref, currentGoal),
-              child: const Icon(Icons.add_task_rounded),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+              child: const Icon(Icons.add_sharp, size: 28),
             ),
+      ),
     );
   }
 
@@ -85,69 +101,67 @@ class GoalDetailScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (isCompleted)
-          Center(
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 16),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.amber),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.emoji_events_rounded, color: Colors.amber),
-                  SizedBox(width: 8),
-                  Text('BẠN ĐÃ XUẤT SẮC HOÀN THÀNH!',
-                      style: TextStyle(
-                          color: Colors.amber,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12)),
-                ],
-              ),
+          Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.zero,
+              border: Border.all(color: Colors.amber, width: 1),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.emoji_events_sharp, color: Colors.amber),
+                SizedBox(width: 8),
+                Text('OUTSTANDING ACHIEVEMENT!',
+                    style: TextStyle(
+                        color: Colors.amber,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0,
+                        fontSize: 12)),
+              ],
             ),
           ),
         Text(
-          goal.title,
-          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          goal.title.toUpperCase(),
+          style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 1.5, color: Theme.of(context).colorScheme.onSurface),
         ),
         const SizedBox(height: 8),
         Text(
           goal.description,
           style: TextStyle(
             fontSize: 16,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
           ),
         ),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: isCompleted
-                ? Colors.amber.withOpacity(0.05)
-                : Theme.of(context).colorScheme.primary.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(24),
-            border: isCompleted
-                ? Border.all(color: Colors.amber.withOpacity(0.2))
-                : null,
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.zero,
+            border: Border.all(
+              color: isCompleted ? Colors.amber : Theme.of(context).colorScheme.primary,
+              width: 1,
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildInfoItem(
                 context,
-                Icons.task_alt_rounded,
-                'Số nhiệm vụ',
+                Icons.check_box_sharp,
+                'TASKS',
                 '${goal.subGoals.length}',
-                isCompleted ? Colors.amber : null,
+                isCompleted ? Colors.amber : Theme.of(context).colorScheme.primary,
               ),
               _buildInfoItem(
                 context,
-                Icons.calendar_month_rounded,
-                'Thời gian thực hiện',
+                Icons.calendar_month_sharp,
+                'DEADLINE',
                 DateFormat('dd/MM/yyyy').format(goal.deadline),
-                isCompleted ? Colors.amber : null,
+                isCompleted ? Colors.amber : Theme.of(context).colorScheme.primary,
               ),
             ],
           ),
@@ -162,19 +176,20 @@ class GoalDetailScreen extends ConsumerWidget {
     final primaryColor = color ?? Theme.of(context).colorScheme.primary;
     return Column(
       children: [
-        Icon(icon, color: primaryColor),
+        Icon(icon, color: primaryColor, size: 28),
         const SizedBox(height: 8),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 12,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Colors.grey,
+            fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
         ),
       ],
     );
@@ -185,18 +200,13 @@ class GoalDetailScreen extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isCompleted
-            ? Colors.amber.withOpacity(0.02)
-            : (subGoal.isCompleted
-                ? Theme.of(context).colorScheme.primary.withOpacity(0.05)
-                : Theme.of(context).colorScheme.surface),
-        borderRadius: BorderRadius.circular(16),
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.zero,
         border: Border.all(
           color: isCompleted
-              ? Colors.amber.withOpacity(0.1)
-              : (subGoal.isCompleted
-                  ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
-                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
+              ? Colors.amber
+              : (subGoal.isCompleted ? Theme.of(context).colorScheme.primary : Colors.grey.shade800),
+          width: 1,
         ),
       ),
       child: CheckboxListTile(
@@ -209,19 +219,20 @@ class GoalDetailScreen extends ConsumerWidget {
                     .toggleSubGoal(goal, subGoal.id);
               },
         title: Text(
-          subGoal.title,
+          subGoal.title.toUpperCase(),
           style: TextStyle(
             decoration: subGoal.isCompleted ? TextDecoration.lineThrough : null,
-            fontWeight:
-                subGoal.isCompleted ? FontWeight.normal : FontWeight.w600,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.0,
             color: subGoal.isCompleted
-                ? Theme.of(context).colorScheme.onSurface.withOpacity(0.4)
+                ? Colors.grey.shade600
                 : Theme.of(context).colorScheme.onSurface,
           ),
         ),
         controlAffinity: ListTileControlAffinity.leading,
-        activeColor: isCompleted ? Colors.amber : null,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        activeColor: isCompleted ? Colors.amber : Theme.of(context).colorScheme.primary,
+        checkColor: Theme.of(context).colorScheme.onPrimary,
+        side: const BorderSide(color: Colors.grey, width: 2),
       ),
     );
   }
@@ -244,16 +255,9 @@ class GoalDetailScreen extends ConsumerWidget {
           TextButton(
             onPressed: () {
               if (controller.text.isNotEmpty) {
-                final newSubGoal = SubGoal(
-                  id: DateTime.now().toString(),
-                  title: controller.text,
-                );
-                final updatedGoal = goal.copyWith(
-                  subGoals: [...goal.subGoals, newSubGoal],
-                );
                 ref
                     .read(goalVMProvider.notifier)
-                    .updateGoal(goal.key, updatedGoal);
+                    .addSubGoal(goal, controller.text);
                 Navigator.pop(context);
               }
             },

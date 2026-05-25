@@ -12,27 +12,25 @@ class HabitStatisticsScreen extends ConsumerWidget {
     final habits = ref.watch(habitVMProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
-    // ── Tính toán dữ liệu 7 ngày gần nhất ──
-    final now = DateTime.now();
-    final last7Days = List.generate(7, (index) {
-      return now.subtract(Duration(days: 6 - index));
-    });
+    // Lấy dữ liệu thống kê từ Provider (MVVM-compliant)
+    final stats = ref.watch(habitStatisticsProvider);
+    final last7Days = stats.last7Days;
+    final dailyCompletionData = stats.dailyCompletionData;
+    final totalCompletions = stats.totalCompletions;
 
-    final dailyCompletionData = last7Days.map((date) {
-      final dateStr = DateFormat('yyyy-MM-dd').format(date);
-      final total = habits.length;
-      if (total == 0) return 0.0;
-      final completed = habits.where((h) => h.completedDays.contains(dateStr)).length;
-      return (completed / total) * 100;
-    }).toList();
-
-    // Tính tổng số lần hoàn thành từ trước đến nay
-    final totalCompletions = habits.fold<int>(0, (sum, h) => sum + h.completedDays.length);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Thống kê thói quen'),
-      ),
+      return Theme(
+        data: Theme.of(context).copyWith(
+          appBarTheme: AppBarTheme(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            foregroundColor: Theme.of(context).colorScheme.onSurface,
+            elevation: 0,
+          ),
+        ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('DISCIPLINE STATS', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+          centerTitle: true,
+        ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -42,26 +40,26 @@ class HabitStatisticsScreen extends ConsumerWidget {
             Row(
               children: [
                 _StatCard(
-                  title: 'Tổng hoàn thành',
+                  title: 'TOTAL COMPLETIONS',
                   value: totalCompletions.toString(),
-                  icon: Icons.check_circle_rounded,
-                  color: Colors.green,
+                  icon: Icons.check_box_sharp,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(width: 12),
                 _StatCard(
-                  title: 'Thói quen đang có',
+                  title: 'ACTIVE HABITS',
                   value: habits.length.toString(),
-                  icon: Icons.list_alt_rounded,
-                  color: colorScheme.primary,
+                  icon: Icons.list_alt_sharp,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
 
             // ── Biểu đồ ──
-            const Text(
-              'Tỉ lệ hoàn thành (7 ngày qua)',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              'COMPLETION RATE (7 DAYS)',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface, letterSpacing: 1.5),
             ),
             const SizedBox(height: 16),
             Container(
@@ -69,13 +67,8 @@ class HabitStatisticsScreen extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(8, 24, 24, 8),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                  )
-                ],
+                borderRadius: BorderRadius.zero,
+                border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
               ),
               child: BarChart(
                 BarChartData(
@@ -130,13 +123,13 @@ class HabitStatisticsScreen extends ConsumerWidget {
                       barRods: [
                         BarChartRodData(
                           toY: dailyCompletionData[i],
-                          color: colorScheme.primary,
+                          color: Theme.of(context).colorScheme.primary,
                           width: 16,
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                          borderRadius: BorderRadius.zero,
                           backDrawRodData: BackgroundBarChartRodData(
                             show: true,
                             toY: 100,
-                            color: colorScheme.primary.withOpacity(0.1),
+                            color: Colors.grey.shade900,
                           ),
                         ),
                       ],
@@ -146,16 +139,17 @@ class HabitStatisticsScreen extends ConsumerWidget {
               ),
             ),
             
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
             // ── Danh sách chi tiết ──
-            const Text(
-              'Độ kiên trì',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              'CONSISTENCY',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface, letterSpacing: 1.5),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             ...habits.map((h) => _HabitSummaryTile(habit: h)).toList(),
           ],
         ),
+      ),
       ),
     );
   }
@@ -174,28 +168,28 @@ class _StatCard extends StatelessWidget {
     required this.color,
   });
 
-  @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.2)),
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.zero,
+          border: Border.all(color: color, width: 1),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: color),
-            const SizedBox(height: 12),
+            Icon(icon, color: color, size: 28),
+            const SizedBox(height: 16),
             Text(
               value,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color),
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: color, letterSpacing: 2.0),
             ),
+            const SizedBox(height: 4),
             Text(
               title,
-              style: TextStyle(fontSize: 12, color: color.withOpacity(0.8)),
+              style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 1.0),
             ),
           ],
         ),
@@ -208,37 +202,40 @@ class _HabitSummaryTile extends StatelessWidget {
   final dynamic habit;
   const _HabitSummaryTile({required this.habit});
 
-  @override
   Widget build(BuildContext context) {
     final count = habit.completedDays.length;
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.zero,
+        border: Border.all(color: Colors.grey.shade800, width: 1),
       ),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: habit.colorValue != null ? Color(habit.colorValue!).withOpacity(0.2) : Colors.grey.withOpacity(0.2),
-              shape: BoxShape.circle,
+              color: habit.colorValue != null ? Color(habit.colorValue!).withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+              shape: BoxShape.rectangle,
+              border: Border.all(color: habit.colorValue != null ? Color(habit.colorValue!) : Colors.grey, width: 1),
             ),
             child: Icon(
-              Icons.star_rounded,
+              Icons.star_sharp,
               color: habit.colorValue != null ? Color(habit.colorValue!) : Colors.grey,
+              size: 24,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(habit.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text('Đã hoàn thành $count lần', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                Text(habit.name.toUpperCase(), style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onSurface, fontSize: 16, letterSpacing: 1.0)),
+                const SizedBox(height: 4),
+                Text('COMPLETED $count TIMES', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
               ],
             ),
           ),

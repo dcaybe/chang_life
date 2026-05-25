@@ -253,7 +253,7 @@ class ActiveWorkoutViewModel extends StateNotifier<ActiveWorkoutState> {
     state = state.copyWith(session: state.session!.copyWith(exerciseLogs: logs));
   }
 
-  void finishSession(WorkoutHiveService hiveService) {
+  void finishSession() {
 
     if (state.session == null) return;
     
@@ -262,7 +262,7 @@ class ActiveWorkoutViewModel extends StateNotifier<ActiveWorkoutState> {
       dateCompleted: DateTime.now(),
     );
     
-    hiveService.addWorkout(completedSession);
+    _hiveService.addWorkout(completedSession);
     state = ActiveWorkoutState(); 
   }
 

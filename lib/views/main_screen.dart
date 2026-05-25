@@ -10,33 +10,59 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: navigationShell.currentIndex,
-        onDestinationSelected: (index) {
-          navigationShell.goBranch(index);
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.check_circle_outline),
-            selectedIcon: Icon(Icons.check_circle),
-            label: 'Habits',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(color: Theme.of(context).dividerColor, width: 1),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.restaurant_menu_outlined),
-            selectedIcon: Icon(Icons.restaurant_menu),
-            label: 'Nutrition',
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: Theme.of(context).cardColor,
+          type: BottomNavigationBarType.fixed,
+          currentIndex: navigationShell.currentIndex,
+          selectedItemColor: Theme.of(context).colorScheme.primary,
+          unselectedItemColor: Colors.grey,
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.0,
+            fontSize: 10,
           ),
-          NavigationDestination(
-            icon: Icon(Icons.flag_outlined),
-            selectedIcon: Icon(Icons.flag),
-            label: 'Goals',
+          unselectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.0,
+            fontSize: 10,
           ),
-          NavigationDestination(
-            icon: Icon(Icons.fitness_center_outlined),
-            selectedIcon: Icon(Icons.fitness_center),
-            label: 'Workouts',
-          ),
-        ],
+          onTap: (index) {
+            navigationShell.goBranch(index);
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.check_circle_outline),
+              activeIcon: Icon(Icons.check_circle),
+              label: 'HABITS',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.restaurant_menu_outlined),
+              activeIcon: Icon(Icons.restaurant_menu),
+              label: 'NUTRITION',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.flag_outlined),
+              activeIcon: Icon(Icons.flag),
+              label: 'GOALS',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.fitness_center_outlined),
+              activeIcon: Icon(Icons.fitness_center),
+              label: 'WORKOUTS',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'PROFILE',
+            ),
+          ],
+        ),
       ),
     );
   }

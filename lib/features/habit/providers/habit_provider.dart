@@ -14,6 +14,44 @@ final countComplete = Provider<int>((ref) {
     habitVMProvider.select((list) => list.where((h) => h.isCompletedOn(now)).length),
   );
 });
+
+final habitProgressProvider = Provider<double>((ref) {
+  final habits = ref.watch(habitVMProvider);
+  if (habits.isEmpty) return 0.0;
+  final now = DateTime.now();
+  final completed = habits.where((h) => h.isCompletedOn(now)).length;
+  return completed / habits.length;
+});
+
+class HabitStats {
+  final List<DateTime> last7Days;
+  final List<double> dailyCompletionData;
+  final int totalCompletions;
+
+  HabitStats(this.last7Days, this.dailyCompletionData, this.totalCompletions);
+}
+
+final habitStatisticsProvider = Provider<HabitStats>((ref) {
+  final habits = ref.watch(habitVMProvider);
+  final now = DateTime.now();
+  
+  final last7Days = List.generate(7, (index) {
+    return now.subtract(Duration(days: 6 - index));
+  });
+
+  final dailyCompletionData = last7Days.map((date) {
+    final dateStr = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+    final total = habits.length;
+    if (total == 0) return 0.0;
+    final completed = habits.where((h) => h.completedDays.contains(dateStr)).length;
+    return (completed / total) * 100;
+  }).toList();
+
+  final totalCompletions = habits.fold<int>(0, (sum, h) => sum + h.completedDays.length);
+
+  return HabitStats(last7Days, dailyCompletionData, totalCompletions);
+});
+
 final habitProvider = Provider.family<Habit, String>((ref, id) {
   return ref.watch(
     habitVMProvider.select((list) => list.firstWhere((h) => h.id == id)),
