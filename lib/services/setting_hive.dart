@@ -95,6 +95,7 @@ class StorageService {
   Future<void> markOnboardingSeen() async {
     await _settingsBox.put('has_seen_onboarding', true);
   }
+
   // --- NUTRITION ---
   bool hasConfiguredNutrition() {
     return _settingsBox.get('has_configured_nutrition', defaultValue: false);
@@ -110,5 +111,41 @@ class StorageService {
 
   Future<void> setNutritionTotalCalories(int calories) async {
     await _settingsBox.put('nutrition_total_calories', calories);
+  }
+
+  int getNutritionProtein() {
+    return _settingsBox.get('nutrition_protein', defaultValue: 0);
+  }
+
+  Future<void> setNutritionProtein(int value) async {
+    await _settingsBox.put('nutrition_protein', value);
+  }
+
+  int getNutritionCarbs() {
+    return _settingsBox.get('nutrition_carbs', defaultValue: 0);
+  }
+
+  Future<void> setNutritionCarbs(int value) async {
+    await _settingsBox.put('nutrition_carbs', value);
+  }
+
+  int getNutritionFats() {
+    return _settingsBox.get('nutrition_fats', defaultValue: 0);
+  }
+
+  Future<void> setNutritionFats(int value) async {
+    await _settingsBox.put('nutrition_fats', value);
+  }
+
+  DateTime? getNutritionStartDate() {
+    final timestamp = _settingsBox.get('nutrition_start_date');
+    if (timestamp != null) {
+      return DateTime.fromMillisecondsSinceEpoch(timestamp);
+    }
+    return null;
+  }
+
+  Future<void> setNutritionStartDate(DateTime date) async {
+    await _settingsBox.put('nutrition_start_date', date.millisecondsSinceEpoch);
   }
 }

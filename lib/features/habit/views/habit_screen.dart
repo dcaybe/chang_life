@@ -31,6 +31,15 @@ class _HomePageState extends ConsumerState<HomeScreen> {
         ),
       child: Scaffold(
         appBar: AppBar(
+          title: Text(
+            'HABITS',
+            style: TextStyle(
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.5,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          centerTitle: false,
           backgroundColor: Theme.of(context).cardColor,
           elevation: 0,
           actions: [

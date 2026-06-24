@@ -27,8 +27,9 @@ class HabitStats {
   final List<DateTime> last7Days;
   final List<double> dailyCompletionData;
   final int totalCompletions;
+  final int currentStreak;
 
-  HabitStats(this.last7Days, this.dailyCompletionData, this.totalCompletions);
+  HabitStats(this.last7Days, this.dailyCompletionData, this.totalCompletions, this.currentStreak);
 }
 
 final habitStatisticsProvider = Provider<HabitStats>((ref) {
@@ -49,7 +50,32 @@ final habitStatisticsProvider = Provider<HabitStats>((ref) {
 
   final totalCompletions = habits.fold<int>(0, (sum, h) => sum + h.completedDays.length);
 
-  return HabitStats(last7Days, dailyCompletionData, totalCompletions);
+  int currentStreak = 0;
+  if (habits.isNotEmpty) {
+    DateTime dateToCheck = DateTime.now();
+    final dateStrToday = "${dateToCheck.year}-${dateToCheck.month.toString().padLeft(2, '0')}-${dateToCheck.day.toString().padLeft(2, '0')}";
+    final completedToday = habits.where((h) => h.completedDays.contains(dateStrToday)).length;
+    
+    if (completedToday == habits.length) {
+      currentStreak++;
+      dateToCheck = dateToCheck.subtract(const Duration(days: 1));
+    } else {
+      dateToCheck = dateToCheck.subtract(const Duration(days: 1));
+    }
+
+    while (true) {
+      final dateStr = "${dateToCheck.year}-${dateToCheck.month.toString().padLeft(2, '0')}-${dateToCheck.day.toString().padLeft(2, '0')}";
+      final completed = habits.where((h) => h.completedDays.contains(dateStr)).length;
+      if (completed == habits.length) {
+        currentStreak++;
+        dateToCheck = dateToCheck.subtract(const Duration(days: 1));
+      } else {
+        break;
+      }
+    }
+  }
+
+  return HabitStats(last7Days, dailyCompletionData, totalCompletions, currentStreak);
 });
 
 final habitProvider = Provider.family<Habit, String>((ref, id) {

@@ -1,6 +1,7 @@
 import 'package:change_life/features/workout/models/exercise_model.dart';
 import 'package:change_life/features/workout/models/workout_model.dart';
 import 'package:change_life/features/workout/providers/workout_provider.dart';
+import 'package:change_life/features/workout/views/widgets/tutorial_sheet.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,14 +44,22 @@ class WorkoutDetailScreen extends ConsumerWidget {
         appBar: AppBar(
           title: Text(
             latestSession.name.toUpperCase(),
-            style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5),
+            style: const TextStyle(
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.5,
+            ),
           ),
           actions: [
             IconButton(
-              icon: Icon(Icons.edit_calendar_sharp, color: Theme.of(context).colorScheme.primary),
+              icon: Icon(
+                Icons.edit_calendar_sharp,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               tooltip: 'Chỉnh sửa kế hoạch',
               onPressed: () {
-                final notifier = ref.read(activeWorkoutViewModelProvider.notifier);
+                final notifier = ref.read(
+                  activeWorkoutViewModelProvider.notifier,
+                );
                 notifier.startSession(latestSession);
                 if (!ref.read(activeWorkoutViewModelProvider).isEditMode) {
                   notifier.toggleEditMode();
@@ -77,16 +86,24 @@ class WorkoutDetailScreen extends ConsumerWidget {
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
                   elevation: 0,
                 ),
                 icon: const Icon(Icons.play_arrow_sharp, size: 28),
                 label: const Text(
                   'START WORKOUT',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1.5),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.5,
+                  ),
                 ),
                 onPressed: () {
-                  final notifier = ref.read(activeWorkoutViewModelProvider.notifier);
+                  final notifier = ref.read(
+                    activeWorkoutViewModelProvider.notifier,
+                  );
                   notifier.startSession(latestSession);
                   if (ref.read(activeWorkoutViewModelProvider).isEditMode) {
                     notifier.toggleEditMode();
@@ -98,7 +115,10 @@ class WorkoutDetailScreen extends ConsumerWidget {
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Divider(color: Theme.of(context).colorScheme.primary, thickness: 1),
+              child: Divider(
+                color: Theme.of(context).colorScheme.primary,
+                thickness: 1,
+              ),
             ),
 
             // ── Exercise cards ──
@@ -147,7 +167,7 @@ class _SummaryRow extends StatelessWidget {
         const SizedBox(width: 8),
         _Chip(
           icon: Icons.timer_outlined,
-          label: '~${(totalSets * 1.5).toStringAsFixed(0)} phút',
+          label: '~${(totalSets * 4).toStringAsFixed(0)} phút',
           color: Colors.green,
         ),
       ],
@@ -212,20 +232,26 @@ class _ExerciseDetailCardState extends ConsumerState<_ExerciseDetailCard> {
     final colorScheme = Theme.of(context).colorScheme;
 
     // Get historical volume data via ViewModel (MVVM-compliant)
-    final historyData = ref.read(workoutViewModelProvider.notifier)
+    final historyData = ref
+        .read(workoutViewModelProvider.notifier)
         .getExerciseVolumeHistory(log.exercise.name);
     final historyLogs = historyData
-        .map((d) => _VolumePoint(
-              date: d['date'] as DateTime,
-              volume: d['volume'] as double,
-            ))
+        .map(
+          (d) => _VolumePoint(
+            date: d['date'] as DateTime,
+            volume: d['volume'] as double,
+          ),
+        )
         .toList();
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary,
+          width: 1,
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -256,6 +282,8 @@ class _ExerciseDetailCardState extends ConsumerState<_ExerciseDetailCard> {
                     children: [
                       Text(
                         log.exercise.name.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
@@ -266,6 +294,8 @@ class _ExerciseDetailCardState extends ConsumerState<_ExerciseDetailCard> {
                       if (log.exercise.targetMuscle.isNotEmpty)
                         Text(
                           log.exercise.targetMuscle.toUpperCase(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 12,
                             color: Theme.of(context).colorScheme.primary,
@@ -276,7 +306,6 @@ class _ExerciseDetailCardState extends ConsumerState<_ExerciseDetailCard> {
                     ],
                   ),
                 ),
-                // Nút toggle biểu đồ
                 TextButton.icon(
                   onPressed: () => setState(() => _showChart = !_showChart),
                   icon: Icon(
@@ -286,13 +315,36 @@ class _ExerciseDetailCardState extends ConsumerState<_ExerciseDetailCard> {
                   ),
                   label: Text(
                     _showChart ? 'HIDE' : 'HISTORY',
-                    style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w900),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     visualDensity: VisualDensity.compact,
-                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero,
+                    ),
                   ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.info_outline, color: Theme.of(context).colorScheme.primary, size: 22),
+                  tooltip: 'Xem hướng dẫn',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (_) => FractionallySizedBox(
+                        heightFactor: 0.8,
+                        child: TutorialSheet(exerciseName: log.exercise.name),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

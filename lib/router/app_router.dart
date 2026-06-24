@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:change_life/features/goal/models/goal_model.dart';
 import 'package:change_life/features/goal/views/goal_detail_screen.dart';
 import 'package:change_life/features/goal/views/goal_screen.dart';
@@ -15,6 +16,7 @@ import 'package:change_life/features/workout/views/workout_detail_screen.dart';
 import 'package:change_life/features/workout/views/workout_screen.dart';
 import 'package:change_life/views/main_screen.dart';
 import 'package:change_life/features/nutrition/views/nutrition_screen.dart';
+import 'package:change_life/features/nutrition/views/nutrition_design_screen.dart';
 import 'package:change_life/features/auth/views/login_screen.dart';
 import 'package:change_life/features/profile/views/profile_screen.dart';
 import 'package:change_life/features/profile/views/settings_screen.dart';
@@ -23,10 +25,12 @@ import 'package:go_router/go_router.dart';
 
 class AppRouter {
   static late final GoRouter router;
+  static final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
   static void init(StorageService storageService) {
     // Splash always shows first for 2s, then navigates
     router = GoRouter(
+      navigatorKey: rootNavigatorKey,
       initialLocation: '/splash',
       routes: [
         GoRoute(
@@ -80,10 +84,16 @@ class AppRouter {
                         return NutritionDetailScreen(food: food);
                       },
                     ),
+                    GoRoute(
+                      path: 'design',
+                      parentNavigatorKey: rootNavigatorKey,
+                      builder: (context, state) => const NutritionDesignScreen(),
+                    ),
                   ],
                 ),
               ],
             ),
+            /*
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -101,6 +111,7 @@ class AppRouter {
                 ),
               ],
             ),
+            */
             StatefulShellBranch(
               routes: [
                 GoRoute(

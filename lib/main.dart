@@ -9,10 +9,12 @@ import 'package:change_life/services/habit_hive_service.dart';
 import 'package:change_life/services/setting_hive.dart';
 import 'package:change_life/features/nutrition/models/food_model.dart';
 import 'package:change_life/features/nutrition/models/meal_plan_model.dart';
+import 'package:change_life/features/nutrition/models/nutrition_history_model.dart';
 import 'package:change_life/services/food_hive_service.dart';
 import 'package:change_life/services/nutrition_hive_service.dart';
 import 'package:change_life/features/nutrition/providers/nutrition_services.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; 
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
 
@@ -21,16 +23,22 @@ import 'package:change_life/features/workout/models/exercise_model.dart';
 import 'package:change_life/services/workout_hive_service.dart';
 import 'package:change_life/features/workout/providers/workout_provider.dart';
 import 'package:change_life/theme/app_theme.dart';
-
+import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+
+  await Supabase.initialize(
+    url: 'https://oywajngcajhacfjfejqp.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95d2FqbmdjYWpoYWNmamZlanFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NzY0NTAsImV4cCI6MjA5NTA1MjQ1MH0.pP2etTSIXXAReF2wlOHPa4Qj9_H7r6mdQ7OSeg85kwY',
+  );
 
   Hive.registerAdapter(GoalAdapter());
   Hive.registerAdapter(SubGoalAdapter());
   Hive.registerAdapter(HabitAdapter());
   Hive.registerAdapter(FoodAdapter());
   Hive.registerAdapter(MealPlanAdapter());
+  Hive.registerAdapter(NutritionHistoryAdapter());
   Hive.registerAdapter(WorkoutSessionAdapter());
   Hive.registerAdapter(ExerciseAdapter());
   Hive.registerAdapter(WorkoutSetAdapter());

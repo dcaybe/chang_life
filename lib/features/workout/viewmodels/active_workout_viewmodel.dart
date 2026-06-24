@@ -11,6 +11,10 @@ class ActiveWorkoutState {
   final bool isEditMode;
   /// ID của buổi tập gốc (template) — dùng để xóa khỏi danh sách
   final String? templateId;
+  /// Thời gian đã tập (giây) — chạy liên tục từ khi startSession()
+  final int elapsedSeconds;
+  /// Thời điểm bắt đầu buổi tập
+  final DateTime? startTime;
 
   ActiveWorkoutState({
     this.session,
@@ -18,6 +22,8 @@ class ActiveWorkoutState {
     this.isTimerActive = false,
     this.isEditMode = false,
     this.templateId,
+    this.elapsedSeconds = 0,
+    this.startTime,
   });
 
   ActiveWorkoutState copyWith({
@@ -26,6 +32,8 @@ class ActiveWorkoutState {
     bool? isTimerActive,
     bool? isEditMode,
     String? templateId,
+    int? elapsedSeconds,
+    DateTime? startTime,
   }) {
     return ActiveWorkoutState(
       session: session ?? this.session,
@@ -33,6 +41,8 @@ class ActiveWorkoutState {
       isTimerActive: isTimerActive ?? this.isTimerActive,
       isEditMode: isEditMode ?? this.isEditMode,
       templateId: templateId ?? this.templateId,
+      elapsedSeconds: elapsedSeconds ?? this.elapsedSeconds,
+      startTime: startTime ?? this.startTime,
     );
   }
 
@@ -42,6 +52,25 @@ class ActiveWorkoutState {
     return session!.exerciseLogs.every(
       (log) => log.sets.isNotEmpty && log.sets.every((s) => s.isCompleted),
     );
+  }
+
+  /// True khi user đã tick ít nhất 1 set (có tiến trình tập)
+  bool get hasProgress {
+    if (session == null) return false;
+    return session!.exerciseLogs.any(
+      (log) => log.sets.any((s) => s.isCompleted),
+    );
+  }
+
+  /// Format thời gian elapsed thành HH:MM:SS hoặc MM:SS
+  String get elapsedFormatted {
+    final h = elapsedSeconds ~/ 3600;
+    final m = (elapsedSeconds % 3600) ~/ 60;
+    final s = elapsedSeconds % 60;
+    if (h > 0) {
+      return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+    }
+    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
   /// Trả về session hiện tại được gán lại id gốc — dùng để lưu template.
@@ -54,11 +83,18 @@ class ActiveWorkoutState {
 
 class ActiveWorkoutViewModel extends StateNotifier<ActiveWorkoutState> {
   final WorkoutHiveService _hiveService;
+  final void Function(WorkoutSession) onWorkoutCompleted;
+  final void Function(WorkoutSession)? onUpdateTemplate;
   Timer? _timer;
+  Timer? _elapsedTimer; // Timer đếm thời gian tập
 
-  ActiveWorkoutViewModel(this._hiveService) : super(ActiveWorkoutState());
+  ActiveWorkoutViewModel(this._hiveService, {required this.onWorkoutCompleted, this.onUpdateTemplate}) : super(ActiveWorkoutState());
 
   void startSession(WorkoutSession template) {
+    // Dừng timer cũ nếu có
+    _elapsedTimer?.cancel();
+    _timer?.cancel();
+
     // Clone template sang session mới, giữ lại templateId để hỗ trợ xóa
     final liveSession = template.copyWith(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -67,7 +103,24 @@ class ActiveWorkoutViewModel extends StateNotifier<ActiveWorkoutState> {
         sets: log.sets.map((s) => s.copyWith(isCompleted: false, isPR: false)).toList()
       )).toList(),
     );
-    state = state.copyWith(session: liveSession, templateId: template.id);
+    state = state.copyWith(
+      session: liveSession,
+      templateId: template.id,
+      elapsedSeconds: 0,
+      startTime: DateTime.now(),
+    );
+
+    // Bắt đầu đếm thời gian tập (chỉ khi không phải edit mode)
+    _startElapsedTimer();
+  }
+
+  void _startElapsedTimer() {
+    _elapsedTimer?.cancel();
+    _elapsedTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!state.isEditMode && state.session != null) {
+        state = state.copyWith(elapsedSeconds: state.elapsedSeconds + 1);
+      }
+    });
   }
 
   void toggleSet(int exerciseIndex, int setIndex) {
@@ -257,19 +310,38 @@ class ActiveWorkoutViewModel extends StateNotifier<ActiveWorkoutState> {
 
     if (state.session == null) return;
     
+    // Dừng tất cả timer
+    _timer?.cancel();
+    _elapsedTimer?.cancel();
+
     final completedSession = state.session!.copyWith(
       id: DateTime.now().millisecondsSinceEpoch.toString(), 
       dateCompleted: DateTime.now(),
     );
     
-    _hiveService.addWorkout(completedSession);
+    // Gọi callback để update state global, thay vì ghi trực tiếp vào hive mà không update state
+    onWorkoutCompleted(completedSession);
+
+    // Cập nhật lại template gốc để lưu lại các note hoặc thay đổi set
+    if (onUpdateTemplate != null && state.editedTemplate != null) {
+      onUpdateTemplate!(state.editedTemplate!);
+    }
+
     state = ActiveWorkoutState(); 
+  }
+
+  /// Huỷ buổi tập — dừng timer, reset state
+  void cancelSession() {
+    _timer?.cancel();
+    _elapsedTimer?.cancel();
+    state = ActiveWorkoutState();
   }
 
 
   @override
   void dispose() {
     _timer?.cancel();
+    _elapsedTimer?.cancel();
     super.dispose();
   }
 }

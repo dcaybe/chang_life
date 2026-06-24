@@ -12,7 +12,7 @@ class SettingsViewModel extends Notifier<SettingsState> {
     // 2. Lấy username và isDarkMode hiện tại từ storageService
     final username = storageService.getUsername();
     final isDarkMode = storageService.getDarkMode();
-    
+
     // Parse theme from storage string
     final themeString = storageService.getThemeMode();
     final themeMode = AppThemeMode.values.firstWhere(
@@ -21,7 +21,11 @@ class SettingsViewModel extends Notifier<SettingsState> {
     );
 
     // 3. Trả về đối tượng SettingsState ban đầu
-    return SettingsState(username: username, isDarkMode: isDarkMode, currentTheme: themeMode);
+    return SettingsState(
+      username: username,
+      isDarkMode: isDarkMode,
+      currentTheme: themeMode,
+    );
   }
 
   // Hàm cập nhật tên
@@ -46,13 +50,14 @@ class SettingsViewModel extends Notifier<SettingsState> {
     // 2. Cập nhật RAM (state)
     state = state.copyWith(isDarkMode: newValue);
   }
+
   // Hàm thay đổi Theme
   void changeTheme(AppThemeMode newTheme) {
     final storageService = ref.read(storageServiceProvider);
-    
+
     // 1. Lưu vào ổ cứng
     storageService.saveThemeMode(newTheme.toString().split('.').last);
-    
+
     // 2. Cập nhật RAM (state)
     state = state.copyWith(currentTheme: newTheme);
   }

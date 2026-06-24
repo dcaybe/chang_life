@@ -133,6 +133,14 @@ class WorkoutViewModel extends StateNotifier<List<WorkoutSession>> {
     state = state.where((w) => w.id != id).toList();
   }
 
+  void clearAllPlannedWorkouts() {
+    final planned = state.where((w) => w.dateCompleted == null).toList();
+    for (var w in planned) {
+      _hiveService.removeWorkout(w.id);
+    }
+    state = state.where((w) => w.dateCompleted != null).toList();
+  }
+
   List<WorkoutSession> getWorkoutsForDay(int dayOfWeek) {
     return state.where((w) => w.dayOfWeek == dayOfWeek).toList();
   }
@@ -160,5 +168,68 @@ class WorkoutViewModel extends StateNotifier<List<WorkoutSession>> {
       }
     }
     return history;
+  }
+
+  /// Trả về lịch sử 1RM cao nhất cho một bài tập cụ thể (đã sort theo ngày)
+  List<Map<String, dynamic>> getExercise1RMHistory(String exerciseName) {
+    final completedSessions = state
+        .where((s) => s.dateCompleted != null)
+        .toList()
+      ..sort((a, b) => a.dateCompleted!.compareTo(b.dateCompleted!));
+
+    final history = <Map<String, dynamic>>[];
+    for (var session in completedSessions) {
+      final exerciseLogs = session.exerciseLogs.where(
+        (l) => l.exercise.name.toLowerCase() == exerciseName.toLowerCase(),
+      );
+      double max1RM = 0;
+      for (var exLog in exerciseLogs) {
+        for (var set in exLog.sets) {
+          final oneRM = set.weight * (1 + set.reps / 30);
+          if (oneRM > max1RM) {
+            max1RM = oneRM;
+          }
+        }
+      }
+      if (max1RM > 0) {
+        history.add({
+          'date': session.dateCompleted!,
+          'oneRM': max1RM,
+        });
+      }
+    }
+    return history;
+  }
+
+  /// Lấy danh sách tất cả các tên bài tập đã từng tập trong lịch sử
+  List<String> getCompletedExerciseNames() {
+    final names = <String>{};
+    for (var session in state) {
+      if (session.dateCompleted != null) {
+        for (var log in session.exerciseLogs) {
+          names.add(log.exercise.name);
+        }
+      }
+    }
+    return names.toList()..sort();
+  }
+
+  /// Lấy danh sách bài tập phân theo nhóm cơ từ lịch sử
+  Map<String, List<String>> getCompletedExercisesByMuscle() {
+    final result = <String, Set<String>>{};
+    for (var session in state) {
+      if (session.dateCompleted != null) {
+        for (var log in session.exerciseLogs) {
+          final muscle = log.exercise.targetMuscle.isNotEmpty ? log.exercise.targetMuscle : 'Other';
+          result.putIfAbsent(muscle, () => <String>{});
+          result[muscle]!.add(log.exercise.name);
+        }
+      }
+    }
+    
+    return result.map((key, value) {
+      final list = value.toList()..sort();
+      return MapEntry(key, list);
+    });
   }
 }

@@ -1,9 +1,12 @@
 import 'package:change_life/features/nutrition/models/meal_plan_model.dart';
 import 'package:change_life/features/nutrition/providers/nutrition_provider.dart';
-import 'package:change_life/features/nutrition/providers/nutrition_services.dart';
 import 'package:change_life/features/settings/providers/setting_provider.dart';
+import 'package:change_life/features/nutrition/models/supabase_food_model.dart';
+import 'package:change_life/services/food_db_service.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class NutritionDesignScreen extends ConsumerStatefulWidget {
   const NutritionDesignScreen({super.key});
@@ -24,23 +27,80 @@ class _NutritionDesignScreenState extends ConsumerState<NutritionDesignScreen> {
   final _weightController = TextEditingController();
   String _goal = 'Giữ cân';
   final _targetWeightController = TextEditingController();
+  String _activityLevel = 'Vận động vừa (3-5 ngày/tuần)';
 
   // Form Step 2
-  final List<String> _availableFoods = [
-    'Cơm',
-    'Ức gà',
-    'Thịt lợn',
-    'Thịt bò',
-    'Cá',
-    'Trứng',
-    'Chuối',
-    'Lạc',
-    'Rau xanh',
-    'Khoai lang'
+  final List<SupabaseFood> _selectedFoods = [];
+  List<SupabaseFood> _fetchedFoods = [];
+  bool _isLoadingFoods = false;
+  String _searchQuery = '';
+  String _selectedCategory = 'Tất cả';
+  Timer? _debounce;
+  final FoodDbService _foodDbService = FoodDbService();
+
+  final List<String> _categories = [
+    'Tất cả',
+    'Thịt và sản phẩm chế biến',
+    'Thủy sản và sản phẩm chế biến',
+    'Trứng và sản phẩm chế biến',
+    'Sữa và sản phẩm chế biến',
+    'Ngũ cốc và sản phẩm chế biến',
+    'Khoai củ và sản phẩm chế biến',
+    'Rau, quả, củ dùng làm rau',
+    'Quả chín',
+    'Hạt, quả giàu đạm, béo và sản phẩm chế biến',
   ];
-  final List<String> _selectedFoods = [];
+
   int _meatsPerDay = 2;
   int _mealsPerDay = 4;
+  int _planDays = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchFoods();
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      setState(() {
+        _searchQuery = query;
+      });
+      _fetchFoods();
+    });
+  }
+
+  void _onCategoryChanged(String? category) {
+    if (category != null) {
+      setState(() {
+        _selectedCategory = category;
+      });
+      _fetchFoods();
+    }
+  }
+
+  Future<void> _fetchFoods() async {
+    setState(() {
+      _isLoadingFoods = true;
+    });
+    final foods = await _foodDbService.fetchFoods(
+      searchQuery: _searchQuery,
+      category: _selectedCategory,
+    );
+    if (mounted) {
+      setState(() {
+        _fetchedFoods = foods;
+        _isLoadingFoods = false;
+      });
+    }
+  }
 
   void _nextStep() {
     if (_currentStep == 0) {
@@ -85,12 +145,14 @@ class _NutritionDesignScreenState extends ConsumerState<NutritionDesignScreen> {
       weight: weight,
       gender: _gender,
       goal: _goal,
+      activityLevel: _activityLevel,
       selectedFoods: _selectedFoods,
       mealsPerDay: _mealsPerDay,
+      planDays: _planDays,
     );
 
     if (mounted) {
-      Navigator.pop(context); // Go back to nutrition screen
+      context.pop(); // Go back to nutrition screen
     }
   }
 
@@ -185,6 +247,18 @@ class _NutritionDesignScreenState extends ConsumerState<NutritionDesignScreen> {
             (val) {
           setState(() => _goal = val!);
         }),
+        const SizedBox(height: 16),
+        _buildDropdown(
+            'Mức độ vận động', _activityLevel, [
+              'Ít vận động (Không tập)',
+              'Vận động nhẹ (1-3 ngày/tuần)',
+              'Vận động vừa (3-5 ngày/tuần)',
+              'Vận động nhiều (6-7 ngày/tuần)',
+              'Rất nhiều (Ngày 2 lần)'
+            ],
+            (val) {
+          setState(() => _activityLevel = val!);
+        }),
         if (_goal == 'Tăng cơ, tăng cân') ...[
           const SizedBox(height: 16),
           _buildTextField('Mục tiêu cân nặng (kg)', _targetWeightController,
@@ -195,55 +269,84 @@ class _NutritionDesignScreenState extends ConsumerState<NutritionDesignScreen> {
   }
 
   Widget _buildStep2() {
-    return ListView(
-      padding: const EdgeInsets.all(24),
+    return Column(
       children: [
-        Text('THỰC PHẨM ƯU THÍCH',
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.5)),
-        const SizedBox(height: 8),
-        const Text('Chọn các loại thực phẩm bạn thường xuyên sử dụng',
-            style: TextStyle(color: Colors.grey)),
-        const SizedBox(height: 24),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: _availableFoods.map((food) {
-            final isSelected = _selectedFoods.contains(food);
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  if (isSelected) {
-                    _selectedFoods.remove(food);
-                  } else {
-                    _selectedFoods.add(food);
-                  }
-                });
-              },
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
-                      : Theme.of(context).cardColor,
-                  border: Border.all(
-                      color: isSelected
-                          ? Theme.of(context).colorScheme.primary
-                          : Colors.grey.shade800),
-                ),
-                child: Text(
-                  food,
+        Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('THỰC PHẨM ƯU THÍCH',
                   style: TextStyle(
-                      color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeight.bold),
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5)),
+              const SizedBox(height: 8),
+              const Text('Tìm kiếm và chọn các loại thực phẩm từ cơ sở dữ liệu để chúng tôi xây dựng thực đơn.',
+                  style: TextStyle(color: Colors.grey)),
+              const SizedBox(height: 16),
+              TextField(
+                onChanged: _onSearchChanged,
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+                decoration: InputDecoration(
+                  labelText: 'Tìm kiếm tên thực phẩm...',
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  labelStyle: const TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: Theme.of(context).cardColor,
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey)),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue)),
                 ),
               ),
-            );
-          }).toList(),
+              const SizedBox(height: 16),
+              _buildDropdown('Danh mục', _selectedCategory, _categories, _onCategoryChanged),
+              const SizedBox(height: 8),
+              Text('Đã chọn: ${_selectedFoods.length} thực phẩm', style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _isLoadingFoods
+              ? const Center(child: CircularProgressIndicator())
+              : _fetchedFoods.isEmpty
+                  ? const Center(child: Text('Không tìm thấy thực phẩm nào.', style: TextStyle(color: Colors.grey)))
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                      itemCount: _fetchedFoods.length,
+                      itemBuilder: (context, index) {
+                        final food = _fetchedFoods[index];
+                        final isSelected = _selectedFoods.any((f) => f.id == food.id);
+                        return Card(
+                          color: isSelected ? Theme.of(context).colorScheme.primary.withOpacity(0.1) : Theme.of(context).cardColor,
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide(color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey.shade800),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ListTile(
+                            onTap: () {
+                              setState(() {
+                                if (isSelected) {
+                                  _selectedFoods.removeWhere((f) => f.id == food.id);
+                                } else {
+                                  _selectedFoods.add(food);
+                                }
+                              });
+                            },
+                            title: Text(food.nameVi, style: TextStyle(color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
+                            subtitle: Text(
+                              '${food.energy ?? '-'} kcal | P: ${food.protein ?? '-'}g | C: ${food.carb ?? '-'}g | F: ${food.fat ?? '-'}g\n${food.category}',
+                              style: const TextStyle(color: Colors.grey, fontSize: 12),
+                            ),
+                            trailing: isSelected
+                                ? Icon(Icons.check_circle, color: Theme.of(context).colorScheme.primary)
+                                : Icon(Icons.circle_outlined, color: Colors.grey.shade600),
+                          ),
+                        );
+                      },
+                    ),
         ),
       ],
     );
@@ -273,6 +376,25 @@ class _NutritionDesignScreenState extends ConsumerState<NutritionDesignScreen> {
         _buildDropdownInt('Số loại', _meatsPerDay, [1, 2, 3], (val) {
           setState(() => _meatsPerDay = val!);
         }, suffix: 'loại'),
+        const SizedBox(height: 24),
+        Text('Số ngày xây dựng thực đơn?',
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        _buildDropdownInt('Số ngày', _planDays, [1, 2, 3, 4, 5, 6, 7], (val) {
+          setState(() => _planDays = val!);
+        }, suffix: 'ngày'),
+        const SizedBox(height: 8),
+        Builder(
+          builder: (context) {
+            int meatCount = _selectedFoods.where((f) => 
+                f.category.contains('Thịt') || 
+                f.category.contains('Thủy sản') || 
+                f.category.contains('Trứng')).length;
+            if (meatCount == 0) meatCount = 1;
+            return Text('Gợi ý: Dựa trên số lượng thịt bạn đã chọn ở bước trước, bạn nên tạo thực đơn cho $meatCount ngày rồi lặp lại.',
+               style: const TextStyle(color: Colors.grey, fontSize: 12, fontStyle: FontStyle.italic));
+          },
+        ),
       ],
     );
   }
@@ -289,7 +411,7 @@ class _NutritionDesignScreenState extends ConsumerState<NutritionDesignScreen> {
         filled: true,
         fillColor: Theme.of(context).cardColor,
         enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.transparent)),
+            borderSide: BorderSide(color: Colors.grey)),
         focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
       ),
@@ -308,7 +430,7 @@ class _NutritionDesignScreenState extends ConsumerState<NutritionDesignScreen> {
         filled: true,
         fillColor: Theme.of(context).cardColor,
         enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.transparent)),
+            borderSide: BorderSide(color: Colors.grey)),
         focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
       ),
@@ -331,7 +453,7 @@ class _NutritionDesignScreenState extends ConsumerState<NutritionDesignScreen> {
         filled: true,
         fillColor: Theme.of(context).cardColor,
         enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.transparent)),
+            borderSide: BorderSide(color: Colors.grey)),
         focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
       ),

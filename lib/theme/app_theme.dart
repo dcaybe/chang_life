@@ -22,6 +22,7 @@ class AppTheme {
       onError: Colors.white,
     ),
     cardColor: const Color(0xFF121212),
+    appBarTheme: const AppBarTheme(centerTitle: false),
     dividerColor: const Color(0xFF262626),
     fontFamily: 'Inter',
     textTheme: const TextTheme(
@@ -48,6 +49,7 @@ class AppTheme {
       onError: Colors.white,
     ),
     cardColor: Colors.white,
+    appBarTheme: const AppBarTheme(centerTitle: false),
     dividerColor: const Color(0xFFE0E0E0),
     fontFamily: 'Inter',
     textTheme: const TextTheme(

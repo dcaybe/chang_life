@@ -46,11 +46,13 @@ class MainScreen extends StatelessWidget {
               activeIcon: Icon(Icons.restaurant_menu),
               label: 'NUTRITION',
             ),
+            /*
             BottomNavigationBarItem(
               icon: Icon(Icons.flag_outlined),
               activeIcon: Icon(Icons.flag),
               label: 'GOALS',
             ),
+            */
             BottomNavigationBarItem(
               icon: Icon(Icons.fitness_center_outlined),
               activeIcon: Icon(Icons.fitness_center),

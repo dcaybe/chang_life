@@ -40,14 +40,21 @@ class HabitStatisticsScreen extends ConsumerWidget {
             Row(
               children: [
                 _StatCard(
-                  title: 'TOTAL COMPLETIONS',
+                  title: 'STREAK',
+                  value: stats.currentStreak.toString(),
+                  icon: Icons.local_fire_department,
+                  color: Colors.orange,
+                ),
+                const SizedBox(width: 8),
+                _StatCard(
+                  title: 'COMPLETED',
                   value: totalCompletions.toString(),
                   icon: Icons.check_box_sharp,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 _StatCard(
-                  title: 'ACTIVE HABITS',
+                  title: 'HABITS',
                   value: habits.length.toString(),
                   icon: Icons.list_alt_sharp,
                   color: Theme.of(context).colorScheme.onSurface,
@@ -171,7 +178,7 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.zero,
@@ -180,16 +187,16 @@ class _StatCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: color, size: 28),
-            const SizedBox(height: 16),
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 12),
             Text(
               value,
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: color, letterSpacing: 2.0),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: color, letterSpacing: 1.0),
             ),
             const SizedBox(height: 4),
             Text(
               title,
-              style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+              style: const TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.bold, letterSpacing: 0.5),
             ),
           ],
         ),

@@ -11,9 +11,7 @@ class SettingsScreen extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cài đặt'),
-      ),
+      appBar: AppBar(title: const Text('Cài đặt')),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
@@ -21,7 +19,11 @@ class SettingsScreen extends ConsumerWidget {
             padding: EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               'Giao diện',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
             ),
           ),
           RadioListTile<AppThemeMode>(
@@ -51,13 +53,20 @@ class SettingsScreen extends ConsumerWidget {
             padding: EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               'Ngôn ngữ',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
             ),
           ),
           ListTile(
             leading: const Icon(Icons.language),
             title: const Text('Ngôn ngữ hiển thị'),
-            trailing: const Text('Tiếng Việt', style: TextStyle(color: Colors.grey, fontSize: 14)),
+            trailing: const Text(
+              'Tiếng Việt',
+              style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),
             onTap: () {
               // TODO: Implement language selection
             },
@@ -67,7 +76,11 @@ class SettingsScreen extends ConsumerWidget {
             padding: EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               'Thông báo',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
             ),
           ),
           SwitchListTile(
@@ -91,7 +104,11 @@ class SettingsScreen extends ConsumerWidget {
             padding: EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               'Thông tin ứng dụng',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
             ),
           ),
           ListTile(
@@ -100,14 +117,19 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () {
               // TODO: Navigate to Privacy Policy screen or open URL
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Chính sách bảo mật đang được cập nhật.')),
+                const SnackBar(
+                  content: Text('Chính sách bảo mật đang được cập nhật.'),
+                ),
               );
             },
           ),
           const ListTile(
             leading: Icon(Icons.info_outline),
             title: Text('Phiên bản ứng dụng'),
-            trailing: Text('v1.0.0', style: TextStyle(color: Colors.grey, fontSize: 14)),
+            trailing: Text(
+              'v1.0.0',
+              style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),
           ),
         ],
       ),

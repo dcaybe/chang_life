@@ -1,14 +1,142 @@
 import 'package:change_life/features/workout/models/exercise_model.dart';
 import 'package:change_life/features/workout/providers/workout_provider.dart';
+import 'package:change_life/features/workout/views/widgets/tutorial_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class ActiveWorkoutScreen extends ConsumerWidget {
+class ActiveWorkoutScreen extends ConsumerStatefulWidget {
   const ActiveWorkoutScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ActiveWorkoutScreen> createState() => _ActiveWorkoutScreenState();
+}
+
+class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
+
+  /// Xử lý khi nhấn nút back — hiện cảnh báo nếu đang tập
+  Future<bool> _onWillPop() async {
+    final activeState = ref.read(activeWorkoutViewModelProvider);
+
+    // Nếu đang ở edit mode hoặc chưa bắt đầu tập → cho phép thoát luôn
+    if (activeState.isEditMode || activeState.session == null) {
+      return true;
+    }
+
+    // Hiện dialog cảnh báo
+    final shouldExit = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: Theme.of(context).colorScheme.error, width: 1),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.error,
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.onError, size: 24),
+                  const SizedBox(width: 12),
+                  Text(
+                    'THOÁT BUỔI TẬP?',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onError,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Body
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Bạn đang tập được ${activeState.elapsedFormatted}.',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    activeState.hasProgress
+                        ? 'Nếu thoát, toàn bộ tiến trình tập luyện sẽ bị mất và không được lưu lại.'
+                        : 'Buổi tập chưa bắt đầu. Bạn có muốn thoát?',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Footer
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                border: Border(top: BorderSide(color: Colors.grey.shade800)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.onSurface,
+                        side: BorderSide(color: Theme.of(context).colorScheme.onSurface),
+                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: const Text('TIẾP TỤC TẬP', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                        foregroundColor: Theme.of(context).colorScheme.onError,
+                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: const Text('THOÁT', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (shouldExit == true) {
+      ref.read(activeWorkoutViewModelProvider.notifier).cancelSession();
+      return true;
+    }
+    return false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final activeState = ref.watch(activeWorkoutViewModelProvider);
     final session = activeState.session;
 
@@ -16,146 +144,229 @@ class ActiveWorkoutScreen extends ConsumerWidget {
       return const Scaffold(body: Center(child: Text('No active session')));
     }
 
-    return Theme(
-      data: Theme.of(context).copyWith(
-        appBarTheme: AppBarTheme(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          foregroundColor: Theme.of(context).colorScheme.onSurface,
-          elevation: 0,
-        ),
-      ),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            activeState.isEditMode ? "CHỈNH SỬA KẾ HOẠCH" : session.name.toUpperCase(),
-            style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final shouldPop = await _onWillPop();
+        if (shouldPop) {
+          if (!context.mounted) return;
+          Navigator.of(context).pop();
+        }
+      },
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          appBarTheme: AppBarTheme(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            foregroundColor: Theme.of(context).colorScheme.onSurface,
+            elevation: 0,
           ),
-          actions: [
-            if (activeState.isEditMode)
-              IconButton(
-                icon: Icon(Icons.save_outlined, color: Theme.of(context).colorScheme.primary),
-                tooltip: 'Lưu thay đổi',
-                onPressed: () {
-                  final template = activeState.editedTemplate;
-                  if (template != null) {
-                    ref.read(workoutViewModelProvider.notifier).updateWorkout(template);
-                  }
-                  context.pop();
-                },
-              ),
-            if (activeState.isEditMode && activeState.templateId != null)
-              IconButton(
-                icon: Icon(Icons.delete_forever_outlined, color: Theme.of(context).colorScheme.error),
-                tooltip: 'Xóa buổi tập',
-                onPressed: () async {
-                  final confirmed = await showDialog<bool>(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      backgroundColor: Theme.of(context).cardColor,
-                      title: Text('Xóa buổi tập?', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-                      content: Text(
-                        'Bạn có chắc muốn xóa "${session.name}" không?\nHành động này không thể hoàn tác.',
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(ctx, false),
-                          child: Text('Huỷ', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.error,
-                            foregroundColor: Theme.of(context).colorScheme.onError,
-                            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                          ),
-                          onPressed: () => Navigator.pop(ctx, true),
-                          child: const Text('Xóa'),
-                        ),
-                      ],
-                    ),
-                  );
-                  if (confirmed == true && context.mounted) {
-                    ref.read(workoutViewModelProvider.notifier).deleteWorkout(activeState.templateId!);
-                    context.pop();
-                  }
-                },
-              ),
-          ],
         ),
-        body: Stack(
-          children: [
-            Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    itemCount: session.exerciseLogs.length,
-                    itemBuilder: (context, exIndex) {
-                      final log = session.exerciseLogs[exIndex];
-                      return _ExerciseCard(exIndex: exIndex, log: log);
-                    },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              activeState.isEditMode ? "CHỈNH SỬA KẾ HOẠCH" : session.name.toUpperCase(),
+              style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5),
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () async {
+                final shouldPop = await _onWillPop();
+                if (shouldPop) {
+                  if (!context.mounted) return;
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+            actions: [
+              // Timer hiển thị thời gian tập
+              if (!activeState.isEditMode)
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
+                    border: Border.all(color: Theme.of(context).colorScheme.primary),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.timer_outlined, size: 16, color: Theme.of(context).colorScheme.primary),
+                      const SizedBox(width: 6),
+                      Text(
+                        activeState.elapsedFormatted,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 14,
+                          letterSpacing: 1.5,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                if (!activeState.isEditMode) // Chỉ hiện nút Hoàn thành khi đang tập
-                  Container(
-                    width: double.infinity,
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    padding: const EdgeInsets.all(16.0),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: activeState.allSetsCompleted
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).cardColor,
-                        foregroundColor: activeState.allSetsCompleted
-                            ? Theme.of(context).colorScheme.onPrimary
-                            : Colors.grey,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero,
-                          side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1),
+              if (activeState.isEditMode)
+                IconButton(
+                  icon: Icon(Icons.save_outlined, color: Theme.of(context).colorScheme.primary),
+                  tooltip: 'Lưu thay đổi',
+                  onPressed: () {
+                    final template = activeState.editedTemplate;
+                    if (template != null) {
+                      ref.read(workoutViewModelProvider.notifier).updateWorkout(template);
+                    }
+                    context.pop();
+                  },
+                ),
+              if (activeState.isEditMode && activeState.templateId != null)
+                IconButton(
+                  icon: Icon(Icons.delete_forever_outlined, color: Theme.of(context).colorScheme.error),
+                  tooltip: 'Xóa buổi tập',
+                  onPressed: () async {
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        backgroundColor: Theme.of(context).cardColor,
+                        title: Text('Xóa buổi tập?', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                        content: Text(
+                          'Bạn có chắc muốn xóa "${session.name}" không?\nHành động này không thể hoàn tác.',
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        elevation: 0,
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: Text('Huỷ', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.error,
+                              foregroundColor: Theme.of(context).colorScheme.onError,
+                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                            ),
+                            onPressed: () => Navigator.pop(ctx, true),
+                            child: const Text('Xóa'),
+                          ),
+                        ],
                       ),
-                      onPressed: activeState.allSetsCompleted
-                          ? () {
-                              ref.read(activeWorkoutViewModelProvider.notifier).finishSession();
-                              context.pop();
-                            }
-                          : null,
-                      child: Text(
-                        'LOG WORKOUT',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.5,
-                          color: activeState.allSetsCompleted ? Theme.of(context).colorScheme.onPrimary : Colors.grey,
+                    );
+                    if (confirmed == true && context.mounted) {
+                      ref.read(workoutViewModelProvider.notifier).deleteWorkout(activeState.templateId!);
+                      context.pop();
+                    }
+                  },
+                ),
+            ],
+          ),
+          body: Stack(
+            children: [
+              Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      itemCount: session.exerciseLogs.length,
+                      itemBuilder: (context, exIndex) {
+                        final log = session.exerciseLogs[exIndex];
+                        return _ExerciseCard(exIndex: exIndex, log: log);
+                      },
+                    ),
+                  ),
+                  if (!activeState.isEditMode) // Chỉ hiện nút Hoàn thành khi đang tập
+                    Container(
+                      width: double.infinity,
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      padding: const EdgeInsets.all(16.0),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: activeState.allSetsCompleted
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).cardColor,
+                          foregroundColor: activeState.allSetsCompleted
+                              ? Theme.of(context).colorScheme.onPrimary
+                              : Colors.grey,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero,
+                            side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          elevation: 0,
+                        ),
+                        onPressed: activeState.allSetsCompleted
+                            ? () async {
+                                // Hiển thị thông báo chúc mừng
+                                await showDialog(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    backgroundColor: Theme.of(context).cardColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.zero,
+                                      side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+                                    ),
+                                    title: Row(
+                                      children: [
+                                        const Icon(Icons.emoji_events, color: Colors.amber, size: 32),
+                                        const SizedBox(width: 12),
+                                        Text('CHÚC MỪNG!', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900)),
+                                      ],
+                                    ),
+                                    content: Text(
+                                      'Tuyệt vời! Bạn đã hoàn thành buổi tập "${session.name}" trong ${activeState.elapsedFormatted}.\n\nHãy tiếp tục giữ vững kỷ luật này nhé!',
+                                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 15),
+                                    ),
+                                    actions: [
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Theme.of(context).colorScheme.primary,
+                                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                                        ),
+                                        onPressed: () => Navigator.pop(ctx),
+                                        child: const Text('HOÀN TẤT', style: TextStyle(fontWeight: FontWeight.bold)),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                
+                                if (!context.mounted) return;
+                                ref.read(activeWorkoutViewModelProvider.notifier).finishSession();
+                                context.pop();
+                              }
+                            : null,
+                        child: Text(
+                          'LOG WORKOUT',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.5,
+                            color: activeState.allSetsCompleted ? Theme.of(context).colorScheme.onPrimary : Colors.grey,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-              ],
-            ),
+                ],
+              ),
 
-            if (activeState.isTimerActive)
-              Positioned(
-                bottom: activeState.isEditMode ? 20 : 100,
-                left: 16,
-                right: 16,
-                child: _RestTimerOverlay(seconds: activeState.restTimerSeconds),
-              ),
-            if (activeState.isEditMode)
-              Positioned(
-                bottom: 20,
-                right: 16,
-                child: FloatingActionButton(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                  onPressed: () => _showAddExerciseDialog(context, ref),
-                  child: const Icon(Icons.add, size: 32),
+              if (activeState.isTimerActive)
+                Positioned(
+                  bottom: activeState.isEditMode ? 20 : 100,
+                  left: 16,
+                  right: 16,
+                  child: _RestTimerOverlay(seconds: activeState.restTimerSeconds),
                 ),
-              ),
-          ],
+              if (activeState.isEditMode)
+                Positioned(
+                  bottom: 20,
+                  right: 16,
+                  child: FloatingActionButton(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                    onPressed: () => _showAddExerciseDialog(context, ref),
+                    child: const Icon(Icons.add, size: 32),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -222,14 +433,38 @@ class _ExerciseCard extends ConsumerWidget {
                         ),
                       )
                     : Expanded(
-                        child: Text(
-                          log.exercise.name.toUpperCase(),
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.0,
-                          ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                log.exercise.name.toUpperCase(),
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.info_outline, color: Theme.of(context).colorScheme.primary),
+                              tooltip: 'Xem hướng dẫn',
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (_) => FractionallySizedBox(
+                                    heightFactor: 0.8,
+                                    child: TutorialSheet(exerciseName: log.exercise.name),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ),
                 if (isEditMode)
@@ -242,19 +477,11 @@ class _ExerciseCard extends ConsumerWidget {
               ],
             ),
             // Note Field
-            TextFormField(
-              initialValue: log.notes,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), fontSize: 14),
-              onChanged: (val) => ref
+            _NoteField(
+              initialNote: log.notes,
+              onNoteChanged: (val) => ref
                   .read(activeWorkoutViewModelProvider.notifier)
                   .updateExerciseNote(exIndex, val),
-              decoration: const InputDecoration(
-                hintText: 'Notes...',
-                hintStyle: TextStyle(color: Colors.grey),
-                isDense: true,
-                prefixIcon: Icon(Icons.notes, size: 18, color: Colors.grey),
-                border: InputBorder.none,
-              ),
             ),
             // Stepper chỉnh thời gian nghỉ — chỉ hiện trong Edit Mode
             if (isEditMode)
@@ -784,3 +1011,66 @@ class _RestTimerOverlay extends ConsumerWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────────
+// Note Field
+// ─────────────────────────────────────────────
+class _NoteField extends StatefulWidget {
+  final String initialNote;
+  final ValueChanged<String> onNoteChanged;
+
+  const _NoteField({
+    required this.initialNote,
+    required this.onNoteChanged,
+  });
+
+  @override
+  State<_NoteField> createState() => _NoteFieldState();
+}
+
+class _NoteFieldState extends State<_NoteField> {
+  late TextEditingController _controller;
+  
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialNote);
+  }
+
+  @override
+  void didUpdateWidget(_NoteField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Only update if it's different and we are not currently focused
+    if (widget.initialNote != oldWidget.initialNote && 
+        widget.initialNote != _controller.text) {
+      _controller.text = widget.initialNote;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: _controller,
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+        fontSize: 14,
+      ),
+      onChanged: widget.onNoteChanged,
+      decoration: const InputDecoration(
+        hintText: 'Notes...',
+        hintStyle: TextStyle(color: Colors.grey),
+        isDense: true,
+        prefixIcon: Icon(Icons.notes, size: 18, color: Colors.grey),
+        border: InputBorder.none,
+      ),
+    );
+  }
+}
+
+// Removed _TutorialSheet as it was moved to tutorial_sheet.dart

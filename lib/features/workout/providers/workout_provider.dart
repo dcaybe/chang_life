@@ -15,7 +15,15 @@ final workoutViewModelProvider = StateNotifierProvider<WorkoutViewModel, List<Wo
 
 final activeWorkoutViewModelProvider = StateNotifierProvider<ActiveWorkoutViewModel, ActiveWorkoutState>((ref) {
   final hiveService = ref.watch(workoutHiveServiceProvider);
-  return ActiveWorkoutViewModel(hiveService);
+  return ActiveWorkoutViewModel(
+    hiveService,
+    onWorkoutCompleted: (session) {
+      ref.read(workoutViewModelProvider.notifier).addWorkout(session);
+    },
+    onUpdateTemplate: (template) {
+      ref.read(workoutViewModelProvider.notifier).updateWorkout(template);
+    },
+  );
 });
 
 
