@@ -148,4 +148,17 @@ class StorageService {
   Future<void> setNutritionStartDate(DateTime date) async {
     await _settingsBox.put('nutrition_start_date', date.millisecondsSinceEpoch);
   }
+
+  // --- HABIT STREAK ---
+  List<String> getStreakDays() {
+    final list = _settingsBox.get('streak_days', defaultValue: <String>[]);
+    if (list is List) {
+      return list.map((e) => e.toString()).toList();
+    }
+    return <String>[];
+  }
+
+  Future<void> saveStreakDays(List<String> days) async {
+    await _settingsBox.put('streak_days', days);
+  }
 }

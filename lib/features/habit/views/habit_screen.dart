@@ -20,6 +20,7 @@ class _HomePageState extends ConsumerState<HomeScreen> {
     final progress = ref.watch(habitProgressProvider);
     final completedToday = ref.watch(countComplete);
     final total = habits.length;
+    final stats = ref.watch(habitStatisticsProvider);
 
       return Theme(
         data: Theme.of(context).copyWith(
@@ -90,6 +91,18 @@ class _HomePageState extends ConsumerState<HomeScreen> {
                     Text(
                       'COMPLETED $completedToday/$total HABITS',
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.local_fire_department, color: Theme.of(context).colorScheme.primary, size: 20),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${stats.currentStreak} DAY STREAK',
+                          style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                        ),
+                      ],
                     ),
                   ],
                 ),

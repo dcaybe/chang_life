@@ -3,6 +3,7 @@ import 'package:change_life/features/habit/models/todo_model.dart';
 import 'package:change_life/services/api_service.dart';
 import 'package:change_life/services/habit_hive_service.dart';
 import 'package:change_life/features/habit/viewmodels/habit_viewmodel.dart';
+import 'package:change_life/features/settings/providers/setting_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final habitVMProvider = NotifierProvider<HabitViewModel, List<Habit>>(
@@ -51,12 +52,14 @@ final habitStatisticsProvider = Provider<HabitStats>((ref) {
   final totalCompletions = habits.fold<int>(0, (sum, h) => sum + h.completedDays.length);
 
   int currentStreak = 0;
-  if (habits.isNotEmpty) {
+  final storageService = ref.read(storageServiceProvider);
+  final streakDays = storageService.getStreakDays();
+  
+  if (streakDays.isNotEmpty) {
     DateTime dateToCheck = DateTime.now();
     final dateStrToday = "${dateToCheck.year}-${dateToCheck.month.toString().padLeft(2, '0')}-${dateToCheck.day.toString().padLeft(2, '0')}";
-    final completedToday = habits.where((h) => h.completedDays.contains(dateStrToday)).length;
     
-    if (completedToday == habits.length) {
+    if (streakDays.contains(dateStrToday)) {
       currentStreak++;
       dateToCheck = dateToCheck.subtract(const Duration(days: 1));
     } else {
@@ -65,8 +68,7 @@ final habitStatisticsProvider = Provider<HabitStats>((ref) {
 
     while (true) {
       final dateStr = "${dateToCheck.year}-${dateToCheck.month.toString().padLeft(2, '0')}-${dateToCheck.day.toString().padLeft(2, '0')}";
-      final completed = habits.where((h) => h.completedDays.contains(dateStr)).length;
-      if (completed == habits.length) {
+      if (streakDays.contains(dateStr)) {
         currentStreak++;
         dateToCheck = dateToCheck.subtract(const Duration(days: 1));
       } else {
